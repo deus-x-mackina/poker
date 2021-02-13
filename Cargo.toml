@@ -1,0 +1,52 @@
+[package]
+name = "poker"
+version = "0.1.0"
+authors = ["Daniel Mack"]
+edition = "2018"
+repository = "https://github.com/deus-x-mackina/poker"
+license = "MIT"
+documentation = "https://docs.rs/poker"
+description = "A crate for speedy poker hand evaluation"
+keywords = ["poker", "card", "game", "evaluate", "holdem"]
+categories = ["algorithms", "data-structures", "games", "game-development"]
+readme = "README.md"
+
+[dependencies]
+# Some iterative algorithms
+itertools = "0.10"
+# Iterate through enum variants
+variter = { version = "0.2", default-features = false }
+# Non-cryptographic hashing for faster lookup table generation
+hashers = "1"
+# Shuffle cards
+rand = { version = "0.8", optional = true }
+
+[features]
+default = ["rand"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+[profile.bench]
+lto = true
+codegen-units = 1
+
+[dev-dependencies]
+# Test - Share a LookupTable for testing - doesn't matter if destructors won't run
+lazy_static = "1.4"
+# Test - run code examples in *.md files
+doc-comment = "0.3"
+# Examples
+rustyline = "7.1"
+colored = "2"
+example-helpers = { path = "example-helpers" }
+# Benching
+criterion = "0.3"
+
+[workspace]
+members = ["example-helpers"]
+
+[[bench]]
+name = "evaluator"
+harness = false
