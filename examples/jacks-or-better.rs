@@ -76,6 +76,7 @@ fn main() {
             let message = "Enter the cards' numbers you wish to swap, if any.";
             println!("{}", message.bright_green().bold());
             if let Ok(input) = rl.readline(PROMPT) {
+                if input == "quit" { break 'game }
                 let parsed = input
                     .split_whitespace()
                     .map(str::parse)
