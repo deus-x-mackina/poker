@@ -59,18 +59,14 @@ hands. `jacks-or-better` is a terminal re-creation of the Jacks or Better
 video poker game. Payouts based on [this image](https://www.gamblingsites.com/wp-content/uploads/2016/08/video-poker-pay-table-jacks-or-better.png).
 Rules for the game can be found [here](https://www.onlinepoker.net/games/jacks-or-better).
 
----
-
-### DISCLAIMER
-
-The `jacks-or-better` example from the `poker` crate has themes of gambling
-using a currency called `credits`. This program is meant for example purposes
-only to illustrate one possible use of this library. There is no risk associated
-with running the example as it can be terminated and restarted at any time.
-
-Please be aware of the possible financial risk of real gambling.
-
----
+> ### DISCLAIMER
+>
+> The `jacks-or-better` example from the `poker` crate has themes of gambling
+> using a currency called `credits`. This program is meant for example purposes
+> only to illustrate one possible use of this library. There is no risk associated
+> with running the example as it can be terminated and restarted at any time.
+>
+> Please be aware of the possible financial risk of real gambling.
 
 You can install these examples through `cargo` by running the following command:
 
