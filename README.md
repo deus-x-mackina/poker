@@ -64,7 +64,7 @@ Rules for the game can be found [here](https://www.onlinepoker.net/games/jacks-o
 ### DISCLAIMER
 
 The `jacks-or-better` example from the `poker` crate has themes of gambling
-using a currently called `credits`. This program is meant for example purposes
+using a currency called `credits`. This program is meant for example purposes
 only to illustrate one possible use of this library. There is no risk associated
 with running the example as it can be terminated and restarted at any time.
 
