@@ -437,6 +437,7 @@ impl fmt::Display for Card {
 /// [`try_collect`](ParseToIter::try_collect) to consolidate [`Card`]s into a
 /// collection, or fail upon the first error encountered.
 #[derive(Debug, Clone)]
+#[must_use = "iterators are lazy and do nothing unless consumed"]
 pub struct ParseToIter<I> {
     iter: I,
 }
