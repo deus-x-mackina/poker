@@ -111,7 +111,7 @@ impl fmt::Display for ParseCardError {
                 incorrect_char,
             } => write!(
                 f,
-                "Error parsing input '{}': Invalid rank character '{}', expected one of \
+                "Error parsing input '{}' as a Card: Invalid rank character '{}', expected one of \
                  [23456789TJQKA]",
                 original_input, incorrect_char
             ),
@@ -120,7 +120,7 @@ impl fmt::Display for ParseCardError {
                 incorrect_char,
             } => write!(
                 f,
-                "Error parsing input '{}': Invalid suit character '{}', expected one of [chsd]",
+                "Error parsing input '{}' as a Card: Invalid suit character '{}', expected one of [chsd]",
                 original_input, incorrect_char
             ),
         }
