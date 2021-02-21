@@ -217,7 +217,7 @@ impl LookupTable {
 
 impl AsRef<LookupTable> for LookupTable {
     #[inline]
-    fn as_ref(&self) -> &LookupTable { self }
+    fn as_ref(&self) -> &Self { self }
 }
 
 pub mod constants {

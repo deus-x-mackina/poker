@@ -161,7 +161,7 @@ impl Card {
                 original_input: suit_char.to_string(),
                 incorrect_char,
             })?;
-        Ok(Card::new(rank, suit))
+        Ok(Self::new(rank, suit))
     }
 
     /// Obtain this [`Card`]'s rank, which is one of clubs, hearts, diamonds, or
@@ -260,17 +260,17 @@ impl Card {
     ///     assert!(unique_cards.insert(card));
     /// }
     /// ```
-    pub fn generate_deck() -> impl Iterator<Item = Card> {
+    pub fn generate_deck() -> impl Iterator<Item = Self> {
         Rank::ALL_VARIANTS
             .iter()
             .cartesian_product(Suit::ALL_VARIANTS.iter())
-            .map(|(&rank, &suit)| Card::new(rank, suit))
+            .map(|(&rank, &suit)| Self::new(rank, suit))
     }
 
     /// Like [`Card::generate_deck`], but generate a shuffled deck using
     /// [`rand`] and returned a boxed slice of [`Card`]s.
     #[cfg(feature = "rand")]
-    pub fn generate_shuffled_deck() -> Box<[Card]> {
+    pub fn generate_shuffled_deck() -> Box<[Self]> {
         use rand::prelude::*;
         let mut rng = thread_rng();
         let mut cards = Self::generate_deck().collect::<Box<_>>();
@@ -307,7 +307,7 @@ impl Card {
     ///     ]
     /// );
     /// ```
-    pub fn parse_to_vec<S, T>(strings: S) -> Result<Vec<Card>, ParseCardError>
+    pub fn parse_to_vec<S, T>(strings: S) -> Result<Vec<Self>, ParseCardError>
     where
         S: IntoIterator<Item = T>,
         T: AsRef<str>,
@@ -365,7 +365,7 @@ impl Card {
     #[inline]
     pub fn parse_to_iter<S, T>(
         strings: S,
-    ) -> ParseToIter<impl Iterator<Item = Result<Card, ParseCardError>>>
+    ) -> ParseToIter<impl Iterator<Item = Result<Self, ParseCardError>>>
     where
         S: IntoIterator<Item = T>,
         T: AsRef<str>,
@@ -393,7 +393,7 @@ impl FromStr for Card {
                     original_input: value.to_string(),
                     incorrect_char,
                 })?;
-            Ok(Card::new(rank, suit))
+            Ok(Self::new(rank, suit))
         } else {
             Err(ParseCardError::InvalidLength {
                 original_input: value.to_string(),
