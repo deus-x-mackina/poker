@@ -220,7 +220,7 @@ impl AsRef<LookupTable> for LookupTable {
     fn as_ref(&self) -> &LookupTable { self }
 }
 
-pub(crate) mod constants {
+pub mod constants {
     pub const MAX_STRAIGHT_FLUSH: i16 = 10;
     pub const MAX_FOUR_OF_A_KIND: i16 = 166;
     pub const MAX_FULL_HOUSE: i16 = 322;

@@ -4,7 +4,7 @@ use std::{collections::HashSet, hash::Hash};
 
 /// A trait used to verify if all elements of a collection are unique from each
 /// other.
-pub(crate) trait AllUnique {
+pub trait AllUnique {
     /// Returns whether or not all elements are unique or not.
     fn all_unique(self) -> bool;
 }
