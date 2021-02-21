@@ -157,7 +157,7 @@ macro_rules! cards {
 
 /// Use this macro to chain two or more slices of [`Card`] into a single boxed
 /// slice of [`Card`]. This may be useful for bundling a hand and poker board
-/// together for evaulation, as in Texas Holdem.
+/// together for evaluation, as in Texas Holdem.
 ///
 /// [`Card`]: crate::Card
 #[macro_export]
