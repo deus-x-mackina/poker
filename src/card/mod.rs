@@ -296,6 +296,7 @@ impl Card {
     /// # Example
     ///
     /// ```
+    /// # #![allow(deprecated)]
     /// use poker::{Card, Rank, Suit};
     /// let card_strings = ["Td", "Qc"];
     /// let parsed_cards = Card::parse_to_vec(&card_strings).expect("couldn't parse strings");
@@ -307,6 +308,10 @@ impl Card {
     ///     ]
     /// );
     /// ```
+    #[deprecated(
+        since = "0.2.0",
+        note = "please use `Card::parse_to_iter().try_collect::<Vec<_>>()` instead. This will disappear soon."
+    )]
     pub fn parse_to_vec<S, T>(strings: S) -> Result<Vec<Self>, ParseCardError>
     where
         S: IntoIterator<Item = T>,
