@@ -94,9 +94,8 @@ impl Suit {
             0b1000 => Clubs,
             0b0100 => Diamonds,
             0b0010 => Hearts,
-            0b0001 => Spades,
-            // Should be unreachable
-            #[cold] // Does this actually help? `unreachable!()` can't be used in a const-fn
+            // Really, this should be 0b001 => Spades, _ => unreachable!() but you can't panic
+            // in const functions in stable Rust yet.
             _ => Spades,
         }
     }

@@ -115,9 +115,8 @@ impl Rank {
             9 => Jack,
             10 => Queen,
             11 => King,
-            12 => Ace,
-            // This should be unreachable
-            #[cold] // Does this actually help? `unreachable!()` can't be used in a const-fn
+            // Really, this should be 12 => Ace, _ => unreachable!() but you can't panic
+            // in const functions in stable Rust yet.
             _ => Ace,
         }
     }
