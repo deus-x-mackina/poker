@@ -36,7 +36,7 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.1"
+poker = "0.2"
 ```
 
 ## Features
@@ -48,7 +48,7 @@ decks. This can easily be disabled by disabling default features in your
 
 ```toml
 [dependencies]
-poker = { version = "0.1", default-features = false }
+poker = { version = "0.2", default-features = false }
 ```
 
 ## A Note on Performance
