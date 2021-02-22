@@ -5,7 +5,8 @@ use crate::{
     evaluate::{class::EvalClass, hand_rank::PokerHandRank},
 };
 
-/// Hand metadata stored in the lookup table.
+/// Hand metadata stored in the lookup table. It contains slightly more information than a `EvalClass`,
+/// and is not meant to be public/constructed by hand.
 #[derive(Debug, Copy, Clone)]
 pub enum Meta {
     HighCard {
@@ -49,10 +50,13 @@ pub enum Meta {
 }
 
 impl Meta {
+    /// The best possible hand
     pub const BEST: Self = Self::StraightFlush {
         high_rank: Rank::Ace,
         hand_rank: PokerHandRank::BEST,
     };
+    
+    /// The worst possible hand
     pub const WORST: Self = Self::HighCard {
         high_rank: Rank::Seven,
         hand_rank: PokerHandRank::WORST,

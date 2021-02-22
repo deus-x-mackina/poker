@@ -6,6 +6,8 @@ use crate::{
     constants::{INT_RANKS, PRIMES},
 };
 
+/// Originally from http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation.
+/// This differs from the implementation in Python because we use trailing zeroes.
 #[derive(Clone)]
 struct BitSequence {
     bits: i16,
@@ -40,6 +42,7 @@ impl Iterator for BitSequence {
 #[inline]
 pub fn bit_sequence_generator(bits: i16) -> impl Iterator<Item = i16> { BitSequence::new(bits) }
 
+/// Return the combinations of size `r` from the iterable's items.
 #[inline]
 pub fn combinations_generator<I>(iterable: I, r: usize) -> impl Iterator<Item = Vec<I::Item>>
 where
@@ -49,21 +52,26 @@ where
     iterable.into_iter().combinations(r)
 }
 
+/// Calculate a hand's prime product by using it's bit rank representation. 
 #[inline]
 pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
     let mut product = 1;
     for i in INT_RANKS {
+        // Check to see if the bit for a given rank is turned on
         if rank_bits & (1 << i) != 0 {
+            // If so, we multiply in the prime number corresponding to that rank
             product *= PRIMES[i as usize]
         }
     }
     product
 }
 
+/// Calculate a hand's prime product if an entire `Card` representation is available.
 #[inline]
 pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
     let mut product = 1;
     for &card in hand {
+        // Multiply in the first 8 bits corresponding to the card's prime number
         product *= card.unique_integer() & 0xFF
     }
     product
