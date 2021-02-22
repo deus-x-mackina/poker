@@ -447,11 +447,10 @@ pub struct ParseToIter<I> {
     iter: I,
 }
 
-impl<I: Iterator> Iterator for ParseToIter<I> {
-    type Item = I::Item;
-
+impl<I> std::ops::Deref for ParseToIter<I> {
+    type Target = I;
     #[inline]
-    fn next(&mut self) -> Option<Self::Item> { self.iter.next() }
+    fn deref(&self) -> &Self::Target { &self.iter }
 }
 
 impl<I, T, E> ParseToIter<I>
