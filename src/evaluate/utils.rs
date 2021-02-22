@@ -6,7 +6,7 @@ use crate::{
     constants::{INT_RANKS, PRIMES},
 };
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 struct BitSequence {
     bits: i16,
     t: i16,
