@@ -324,7 +324,7 @@ impl Card {
         };
         let mut vec = Vec::with_capacity(size);
         for string in strings {
-            let card: Card = string.as_ref().parse()?;
+            let card = string.as_ref().parse()?;
             vec.push(card);
         }
         Ok(vec)
@@ -420,6 +420,7 @@ impl Ord for Card {
 }
 
 impl fmt::Debug for Card {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -432,6 +433,7 @@ impl fmt::Debug for Card {
 }
 
 impl fmt::Display for Card {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[ {}{} ]", self.rank(), self.suit())
     }
