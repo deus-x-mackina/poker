@@ -1,5 +1,6 @@
 use std::{collections::HashMap, hash::BuildHasherDefault};
 
+// Use FNV1aHasher64 on 64-bit systems. It hashed much faster.
 #[cfg(not(target_pointer_width = "64"))]
 use hashers::fnv::FNV1aHasher32 as FNV;
 #[cfg(target_pointer_width = "64")]
