@@ -71,7 +71,6 @@ pub struct Evaluator(LookupTable);
 impl Evaluator {
     /// Create a new [`Evaluator`]. Try to call this method only once and share
     /// the instance as much as possible.
-    #[inline]
     pub fn new() -> Self { Self(LookupTable::new()) }
 
     /// Evaluate a hand. This function takes anything that implements
@@ -136,7 +135,6 @@ impl Evaluator {
     ///     .expect("couldn't evaluate hand");
     /// assert!(matches!(result.class(), EvalClass::Flush { .. }));
     /// ```
-    #[inline]
     pub fn evaluate<C: AsRef<[Card]>>(&self, cards: C) -> Result<Eval, EvalError> {
         let cards = cards.as_ref();
         if !cards.all_unique() {

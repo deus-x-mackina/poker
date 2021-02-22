@@ -16,7 +16,6 @@ struct BitSequence {
 }
 
 impl BitSequence {
-    #[inline]
     const fn new(bits: i16) -> Self {
         Self {
             bits,
@@ -29,7 +28,6 @@ impl BitSequence {
 impl Iterator for BitSequence {
     type Item = i16;
 
-    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.t = self.bits | self.bits.wrapping_sub(1);
         self.next_bits = self.t.wrapping_add(1);
@@ -39,11 +37,9 @@ impl Iterator for BitSequence {
     }
 }
 
-#[inline]
 pub fn bit_sequence_generator(bits: i16) -> impl Iterator<Item = i16> { BitSequence::new(bits) }
 
 /// Return the combinations of size `r` from the iterable's items.
-#[inline]
 pub fn combinations_generator<I>(iterable: I, r: usize) -> impl Iterator<Item = Vec<I::Item>>
 where
     I: IntoIterator,
@@ -53,7 +49,6 @@ where
 }
 
 /// Calculate a hand's prime product by using it's bit rank representation. 
-#[inline]
 pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
     let mut product = 1;
     for i in INT_RANKS {
@@ -67,7 +62,6 @@ pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
 }
 
 /// Calculate a hand's prime product if an entire `Card` representation is available.
-#[inline]
 pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
     let mut product = 1;
     for &card in hand {
@@ -78,7 +72,6 @@ pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
 }
 
 /// Obtain the high card from a given set of rank bits bit-ORed together.
-#[inline]
 pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
     for i in INT_RANKS.rev() {
         if rank_bits & (1 << i) != 0 {

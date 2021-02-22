@@ -14,7 +14,6 @@ where
     T: IntoIterator,
     T::Item: Eq + Hash,
 {
-    #[inline]
     fn all_unique(self) -> bool {
         let mut iter = self.into_iter();
         let possible_size = {

@@ -12,6 +12,5 @@ impl PokerHandRank {
     pub const WORST: Self = Self(lookup_table::constants::WORST_HIGH_CARD as i16);
 
     /// Use this rather than Ord, because < meaning better can be confusing.
-    #[inline]
     pub const fn is_better_than(self, other: Self) -> bool { self.0 < other.0 }
 }

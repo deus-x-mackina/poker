@@ -55,7 +55,6 @@ impl Rank {
     /// let ten = Rank::Ten;
     /// assert_eq!(ten.as_char(), 'T');
     /// ```
-    #[inline]
     pub const fn as_char(self) -> char {
         use Rank::*;
         match self {
@@ -77,7 +76,6 @@ impl Rank {
 
     /// Get the integer representation of the rank, a number from 0 to 12
     /// inclusive.
-    #[inline]
     pub(super) const fn as_i32(self) -> i32 {
         use Rank::*;
         match self {
@@ -99,7 +97,6 @@ impl Rank {
 
     /// Create a rank from its integer representation. As this function is
     /// private, be sure to only pass in 0 through 12 inclusive.
-    #[inline]
     pub(super) const fn from_i32(val: i32) -> Self {
         use Rank::*;
         match val {
@@ -123,7 +120,6 @@ impl Rank {
 
     /// Get the string name of this rank. Used for printing hands such as "ace
     /// high".
-    #[inline]
     pub(crate) const fn as_str_name(self) -> &'static str {
         use Rank::*;
         match self {
@@ -145,7 +141,6 @@ impl Rank {
 
     /// Get the plural string name of this rank. Used for printing hands such as
     /// "pair of aces".
-    #[inline]
     pub(crate) const fn as_str_name_plural(self) -> &'static str {
         use Rank::*;
         match self {
@@ -169,7 +164,6 @@ impl Rank {
 impl TryFrom<char> for Rank {
     type Error = char;
 
-    #[inline]
     fn try_from(value: char) -> Result<Self, Self::Error> {
         use Rank::*;
         match value {
@@ -192,6 +186,5 @@ impl TryFrom<char> for Rank {
 }
 
 impl fmt::Display for Rank {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_char(self.as_char()) }
 }

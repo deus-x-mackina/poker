@@ -35,7 +35,6 @@ pub struct LookupTable {
 }
 
 impl LookupTable {
-    #[inline]
     pub fn new() -> Self {
         let mut table = Self {
             flush_lookup: HashMap::with_capacity_and_hasher(6175, DefaultHasher::default()),

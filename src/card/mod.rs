@@ -116,7 +116,6 @@ impl Card {
     /// assert_eq!(card_display, "[ 3♣ ]");
     /// println!("Is this your card? {}", card_display);
     /// ```
-    #[inline]
     pub const fn new(rank: Rank, suit: Suit) -> Self {
         let rank_int = rank.as_i32();
         let suit_int = suit.as_i32();
@@ -147,7 +146,6 @@ impl Card {
     /// let card_two = Card::try_from_chars('8', 'd').expect("invalid rank or suit character");
     /// assert_eq!(card_one, card_two);
     /// ```
-    #[inline]
     pub fn try_from_chars(rank_char: char, suit_char: char) -> Result<Self, ParseCardError> {
         let rank = rank_char
             .try_into()
@@ -175,7 +173,6 @@ impl Card {
     /// let some_card = Card::new(Rank::Queen, Suit::Hearts);
     /// assert_eq!(some_card.rank(), Rank::Queen);
     /// ```
-    #[inline]
     pub const fn rank(self) -> Rank {
         let rank_int = (self.unique_integer >> 8) & 0xF;
         Rank::from_i32(rank_int)
@@ -192,7 +189,6 @@ impl Card {
     /// let some_card = Card::new(Rank::King, Suit::Diamonds);
     /// assert_eq!(some_card.suit(), Suit::Diamonds);
     /// ```
-    #[inline]
     pub const fn suit(self) -> Suit {
         let suit_int = (self.unique_integer >> 12) & 0xF;
         Suit::from_i32(suit_int)
@@ -215,7 +211,6 @@ impl Card {
     /// ```
     ///
     /// [module level documentation]: self
-    #[inline]
     pub const fn unique_integer(self) -> i32 { self.unique_integer }
 
     /// Obtain a two-character [`String`] representation of this [`Card`]. This
@@ -233,7 +228,6 @@ impl Card {
     /// let card_two = card_one_string.parse().expect("couldn't parse string");
     /// assert_eq!(card_one, card_two);
     /// ```
-    #[inline]
     pub fn rank_suit_string(self) -> String {
         let mut s = String::with_capacity(2);
         s.push(self.rank().as_char());
@@ -367,7 +361,6 @@ impl Card {
     ///
     /// [`try_collect`]: ParseToIter::try_collect
     /// [`itertools`]: itertools::Itertools::try_collect
-    #[inline]
     pub fn parse_to_iter<S, T>(
         strings: S,
     ) -> ParseToIter<impl Iterator<Item = Result<Self, ParseCardError>>>
@@ -408,19 +401,16 @@ impl FromStr for Card {
 }
 
 impl PartialOrd for Card {
-    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.rank().partial_cmp(&other.rank())
     }
 }
 
 impl Ord for Card {
-    #[inline]
     fn cmp(&self, other: &Self) -> Ordering { self.rank().cmp(&other.rank()) }
 }
 
 impl fmt::Debug for Card {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
@@ -433,7 +423,6 @@ impl fmt::Debug for Card {
 }
 
 impl fmt::Display for Card {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[ {}{} ]", self.rank(), self.suit())
     }
@@ -451,7 +440,6 @@ pub struct ParseToIter<I> {
 
 impl<I> std::ops::Deref for ParseToIter<I> {
     type Target = I;
-    #[inline]
     fn deref(&self) -> &Self::Target { &self.iter }
 }
 
@@ -463,7 +451,6 @@ where
     /// [`itertools`] crate.
     ///
     /// [`itertools`]: itertools::Itertools::try_collect
-    #[inline]
     pub fn try_collect<C: FromIterator<T>>(self) -> Result<C, E> { self.iter.collect() }
 }
 

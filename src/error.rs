@@ -97,7 +97,6 @@ pub enum ParseCardError {
 }
 
 impl fmt::Display for ParseCardError {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::InvalidLength { original_input } => write!(

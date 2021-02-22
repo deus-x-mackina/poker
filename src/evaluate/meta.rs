@@ -62,7 +62,6 @@ impl Meta {
         hand_rank: PokerHandRank::WORST,
     };
 
-    #[inline]
     pub(crate) const fn hand_rank(self) -> PokerHandRank {
         match self {
             // Is there a more elegant way to do this?
@@ -78,7 +77,6 @@ impl Meta {
         }
     }
 
-    #[inline]
     pub const fn class(self) -> EvalClass {
         match self {
             Self::HighCard { high_rank, .. } => EvalClass::HighCard { high_rank },
@@ -100,34 +98,24 @@ impl Meta {
         }
     }
 
-    #[inline]
     pub const fn is_high_card(self) -> bool { matches!(self, Self::HighCard { .. }) }
 
-    #[inline]
     pub const fn is_pair(self) -> bool { matches!(self, Self::Pair { .. }) }
 
-    #[inline]
     pub const fn is_two_pair(self) -> bool { matches!(self, Self::TwoPair { .. }) }
 
-    #[inline]
     pub const fn is_three_of_a_kind(self) -> bool { matches!(self, Self::ThreeOfAKind { .. }) }
 
-    #[inline]
     pub const fn is_straight(self) -> bool { matches!(self, Self::Straight { .. }) }
 
-    #[inline]
     pub const fn is_flush(self) -> bool { matches!(self, Self::Flush { .. }) }
 
-    #[inline]
     pub const fn is_full_house(self) -> bool { matches!(self, Self::FullHouse { .. }) }
 
-    #[inline]
     pub const fn is_four_of_a_kind(self) -> bool { matches!(self, Self::FourOfAKind { .. }) }
 
-    #[inline]
     pub const fn is_straight_flush(self) -> bool { matches!(self, Self::StraightFlush { .. }) }
 
-    #[inline]
     pub const fn is_royal_flush(self) -> bool {
         matches!(
             self,
@@ -140,14 +128,12 @@ impl Meta {
 }
 
 impl PartialEq for Meta {
-    #[inline]
     fn eq(&self, other: &Self) -> bool { self.hand_rank() == other.hand_rank() }
 }
 
 impl Eq for Meta {}
 
 impl PartialOrd for Meta {
-    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         let hand_rank_self = self.hand_rank();
         let hand_rank_other = other.hand_rank();
@@ -162,7 +148,6 @@ impl PartialOrd for Meta {
 }
 
 impl Ord for Meta {
-    #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         let hand_rank_self = self.hand_rank();
         let hand_rank_other = other.hand_rank();
@@ -177,7 +162,6 @@ impl Ord for Meta {
 }
 
 impl Hash for Meta {
-    #[inline]
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.hand_rank().hash(state); }
 }
 

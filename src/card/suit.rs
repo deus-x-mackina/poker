@@ -35,7 +35,6 @@ impl Suit {
     /// assert_eq!(Suit::Clubs.as_pretty_char(), '♣');
     /// assert_eq!(Suit::Spades.as_pretty_char(), '♠');
     /// ```
-    #[inline]
     pub const fn as_pretty_char(self) -> char {
         use Suit::*;
         match self {
@@ -58,7 +57,6 @@ impl Suit {
     /// assert_eq!(Suit::Spades.as_char(), 's');
     /// assert_eq!(Suit::Hearts.as_char(), 'h');
     /// ```
-    #[inline]
     pub const fn as_char(self) -> char {
         use Suit::*;
         match self {
@@ -74,7 +72,6 @@ impl Suit {
     /// - 0b0010 <== hearts,
     /// - 0b0100 <== diamonds,
     /// - 0b1000 <== clubs
-    #[inline]
     pub(super) const fn as_i32(self) -> i32 {
         use Suit::*;
         match self {
@@ -104,7 +101,6 @@ impl Suit {
 impl TryFrom<char> for Suit {
     type Error = char;
 
-    #[inline]
     fn try_from(value: char) -> Result<Self, Self::Error> {
         use Suit::*;
         match value {
@@ -118,6 +114,5 @@ impl TryFrom<char> for Suit {
 }
 
 impl fmt::Display for Suit {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_char(self.as_pretty_char()) }
 }

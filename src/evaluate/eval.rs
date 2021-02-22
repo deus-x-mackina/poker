@@ -30,58 +30,45 @@ impl Eval {
     /// The worst possible poker hand, a seven-high.
     pub const WORST: Self = Self(Meta::WORST);
 
-    #[inline]
     #[cfg(test)]
     pub(crate) const fn hand_rank(self) -> PokerHandRank { self.0.hand_rank() }
 
     /// The class of poker hand that was evaluated. Useful for pattern matching
     /// as opposed to checking with an `is_x()` method.
-    #[inline]
     pub const fn class(self) -> EvalClass { self.0.class() }
 
     /// Check whether this hand is a high-card.
-    #[inline]
     pub const fn is_high_card(self) -> bool { self.0.is_high_card() }
 
     /// Check whether this hand is a pair.
-    #[inline]
     pub const fn is_pair(self) -> bool { self.0.is_pair() }
 
     /// Check whether this hand is a two-pair.
-    #[inline]
     pub const fn is_two_pair(self) -> bool { self.0.is_two_pair() }
 
     /// Check whether this hand is a three-of-a-kind.
-    #[inline]
     pub const fn is_three_of_a_kind(self) -> bool { self.0.is_three_of_a_kind() }
 
     /// Check whether this hand is a straight.
-    #[inline]
     pub const fn is_straight(self) -> bool { self.0.is_straight() }
 
     /// Check whether this hand is a flush.
-    #[inline]
     pub const fn is_flush(self) -> bool { self.0.is_flush() }
 
     /// Check whether this hand is a full house.
-    #[inline]
     pub const fn is_full_house(self) -> bool { self.0.is_full_house() }
 
     /// Check whether this hand is a four-of-a-kind.
-    #[inline]
     pub const fn is_four_of_a_kind(self) -> bool { self.0.is_four_of_a_kind() }
 
     /// Check whether this hand is a straight flush.
-    #[inline]
     pub const fn is_straight_flush(self) -> bool { self.0.is_straight_flush() }
 
     /// Check whether this hand is a royal flush.
-    #[inline]
     pub const fn is_royal_flush(self) -> bool { self.0.is_royal_flush() }
 }
 
 impl fmt::Display for Eval {
-    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.0.fmt(f) }
 }
 
