@@ -1,8 +1,8 @@
 use std::{collections::HashMap, hash::BuildHasherDefault};
 
 // Use FNV1aHasher64 on 64-bit systems. It hashed much faster.
-// SAFETY: Non-cryptographic algorithms can be used here because it improves hashing performance
-// and the hash tables are not available to mutate in the public interface.
+// SAFETY: Non-cryptographic algorithms can be used here because it improves hashing
+// performance and the hash tables are not available to mutate in the public interface.
 #[cfg(not(target_pointer_width = "64"))]
 use hashers::fnv::FNV1aHasher32 as FNV;
 #[cfg(target_pointer_width = "64")]
@@ -20,13 +20,14 @@ type DefaultHasher = BuildHasherDefault<FNV>;
 
 /// Stores information about looking up poker hands.
 ///
-/// There are two hash tables, one for hands where the cards are suited (flushes and straight flushes)
-/// and one for hands where the cards are not suited (the rest of the poker hands). Both tables are
-/// indexed by a hand's prime product.
+/// There are two hash tables, one for hands where the cards are suited (flushes
+/// and straight flushes) and one for hands where the cards are not suited (the
+/// rest of the poker hands). Both tables are indexed by a hand's prime product.
 ///
-/// For example, the worst possible hand is 23457 (unsuited). The prime product of these ranks is
-/// 2 * 3 * 5 * 7 * 13 = 2730. The evaluation implementation first checks to make sure the hand is
-/// not suited, then indexes into the unsuited lookup to find that `unsuited_lookup\[2730\]` is equal
+/// For example, the worst possible hand is 23457 (unsuited). The prime product
+/// of these ranks is 2 * 3 * 5 * 7 * 13 = 2730. The evaluation implementation
+/// first checks to make sure the hand is not suited, then indexes into the
+/// unsuited lookup to find that `unsuited_lookup\[2730\]` is equal
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct LookupTable {
@@ -45,26 +46,26 @@ impl LookupTable {
         table
     }
 
-    /// Calculate the metadata for flushes, straights, high cards, and straight flushes.
+    /// Calculate the metadata for flushes, straights, high cards, and straight
+    /// flushes.
     fn flushes_straights_high_cards(&mut self) {
         let mut not_straights = Vec::with_capacity(1277);
         // `0b11111` represents a 2-3-4-5-6 hand (suit unknown).
         // the bit sequence generator will help generate other permutations
         // of integers where only five bits are turned on, thus allowing us to consider
-        // every hand combination of five ranks together where each rank is unique, i.e.,
-        // there are no pairs, trips, quads, etc.
-        // We are going to add each combination that isn't a straight into the `not_straights`
-        // vector
+        // every hand combination of five ranks together where each rank is unique,
+        // i.e., there are no pairs, trips, quads, etc.
+        // We are going to add each combination that isn't a straight into the
+        // `not_straights` vector
         let mut gen = utils::bit_sequence_generator(0b11111);
-
 
         // info: We statically calculated all straights in the `STRAIGHTS` constant
         for _ in 0..1286 {
             let bits = gen.next().unwrap();
             let mut not_straight = true;
             for &straight in &STRAIGHTS {
-                // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add it to
-                // our vector
+                // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add
+                // it to our vector
                 if bits ^ straight == 0 {
                     not_straight = false;
                     break;
@@ -75,8 +76,9 @@ impl LookupTable {
             }
         }
 
-        // Now we have `STRAIGHTS` (our constant) and `not_straights` (dynamically calculated).
-        // Using these, we can consider both sets as if the ranks they encode are suited
+        // Now we have `STRAIGHTS` (our constant) and `not_straights` (dynamically
+        // calculated). Using these, we can consider both sets as if the ranks
+        // they encode are suited
         //   - `STRAIGHT` hands suited become straight flushes
         //   - `not_straight` hands become flushes
         // We can also consider them unsuited:
@@ -85,14 +87,16 @@ impl LookupTable {
 
         // Let's first work with the `STRAIGHTS`.
 
-        // If suited, we start with the best hand, a royal flush. This corresponds to a value of 1
+        // If suited, we start with the best hand, a royal flush. This corresponds to a
+        // value of 1
         let mut rank_suited = 1;
 
-        // If unsuited, we start with the best possible straight, which is one worse (1+) the worst (max)
-        // flush
+        // If unsuited, we start with the best possible straight, which is one worse
+        // (1+) the worst (max) flush
         let mut rank_unsuited = WORST_FLUSH + 1;
 
-        // These are recycled and hold the rank of the highest card of the hand and the prime product
+        // These are recycled and hold the rank of the highest card of the hand and the
+        // prime product
         let mut high_rank;
         let mut prime_product;
 
@@ -131,15 +135,16 @@ impl LookupTable {
 
         // Now, we work with our `not_straights`.
 
-        // If suited, we have a flush, which is starts just worse than the worst full house
+        // If suited, we have a flush, which is starts just worse than the worst full
+        // house
         rank_suited = WORST_FULL_HOUSE + 1;
 
         // If unsuited, we start just worse than the worst pair
         rank_unsuited = WORST_PAIR + 1;
 
         // Flushes and high cards
-        // We reverse `not_straights` before looping because we generated the worst hands first, but
-        // we want to start mapping from the best hands
+        // We reverse `not_straights` before looping because we generated the worst
+        // hands first, but we want to start mapping from the best hands
         for bits in not_straights.into_iter().rev() {
             // Get the prime product from the bits
             prime_product = utils::prime_product_from_rank_bits(bits);
@@ -180,9 +185,10 @@ impl LookupTable {
         let mut product;
 
         // Four of a kind
-        // Given a four of a kind hand, we know one rank is repeated four times, and one extra card,
-        // the kicker, is left, which can be one of the other eleven card ranks.
-        // We start our rank at just worse than the worst straight flush
+        // Given a four of a kind hand, we know one rank is repeated four times, and one
+        // extra card, the kicker, is left, which can be one of the other eleven
+        // card ranks. We start our rank at just worse than the worst straight
+        // flush
         let mut rank = WORST_STRAIGHT_FLUSH + 1;
 
         // First, select our rank that there will be 4x
@@ -190,8 +196,8 @@ impl LookupTable {
             // Then filter out our 4x rank so we can consider each possible kicker
             let kickers = backwards_ranks.clone().filter(|&kicker| kicker != quad);
             for k in kickers {
-                // Get the prime product by hand, using `pow` if/when the card is present more than
-                // once
+                // Get the prime product by hand, using `pow` if/when the card is present more
+                // than once
                 product = PRIMES[quad as usize].wrapping_pow(4) * PRIMES[k as usize];
 
                 // Map the product to the appropriate hand
@@ -214,9 +220,10 @@ impl LookupTable {
             // ...and select our pair rank
             let pair_ranks = backwards_ranks.clone().filter(|&pr| pr != trips);
             for pr in pair_ranks {
-                // And we calculate the prime product using power of 3 for the 3x rank and power of 2
-                // for the 2x rank
-                product = PRIMES[trips as usize].wrapping_pow(3) * PRIMES[pr as usize].wrapping_pow(2);
+                // And we calculate the prime product using power of 3 for the 3x rank and power
+                // of 2 for the 2x rank
+                product =
+                    PRIMES[trips as usize].wrapping_pow(3) * PRIMES[pr as usize].wrapping_pow(2);
                 self.unsuited_lookup.insert(
                     product,
                     Meta::FullHouse {
@@ -259,8 +266,8 @@ impl LookupTable {
         // Two unique 2x cards and one unique kicker
         rank = WORST_THREE_OF_A_KIND + 1;
 
-        // We want want every combination of two card ranks together to consider as our two pair
-        // ranks
+        // We want want every combination of two card ranks together to consider as our
+        // two pair ranks
         let two_pairs_combos = utils::combinations_generator(backwards_ranks.clone(), 2);
         for two_pair in two_pairs_combos {
             // Pull our two pairs
@@ -297,7 +304,8 @@ impl LookupTable {
                 .clone()
                 .filter(|&kicker| kicker != pair_rank);
 
-            // We want every combination of three unique ranks that aren't equal to our pair rank
+            // We want every combination of three unique ranks that aren't equal to our pair
+            // rank
             let kicker_combos = utils::combinations_generator(kickers, 3);
             for kicker_combo in kicker_combos {
                 let k1 = kicker_combo[0] as usize;

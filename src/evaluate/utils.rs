@@ -7,7 +7,8 @@ use crate::{
 };
 
 /// Originally from http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation.
-/// This differs from the implementation in Python because we use trailing zeroes.
+/// This differs from the implementation in Python because we use trailing
+/// zeroes.
 #[derive(Clone)]
 struct BitSequence {
     bits: i16,
@@ -48,7 +49,7 @@ where
     iterable.into_iter().combinations(r)
 }
 
-/// Calculate a hand's prime product by using it's bit rank representation. 
+/// Calculate a hand's prime product by using it's bit rank representation.
 pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
     let mut product = 1;
     for i in INT_RANKS {
@@ -61,7 +62,8 @@ pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
     product
 }
 
-/// Calculate a hand's prime product if an entire `Card` representation is available.
+/// Calculate a hand's prime product if an entire `Card` representation is
+/// available.
 pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
     let mut product = 1;
     for &card in hand {

@@ -304,7 +304,8 @@ impl Card {
     /// ```
     #[deprecated(
         since = "0.2.0",
-        note = "please use `Card::parse_to_iter().try_collect::<Vec<_>>()` instead. This will disappear soon."
+        note = "please use `Card::parse_to_iter().try_collect::<Vec<_>>()` instead. This will \
+                disappear soon."
     )]
     pub fn parse_to_vec<S, T>(strings: S) -> Result<Vec<Self>, ParseCardError>
     where
@@ -440,6 +441,7 @@ pub struct ParseToIter<I> {
 
 impl<I> std::ops::Deref for ParseToIter<I> {
     type Target = I;
+
     fn deref(&self) -> &Self::Target { &self.iter }
 }
 

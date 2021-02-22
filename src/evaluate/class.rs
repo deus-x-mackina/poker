@@ -81,11 +81,15 @@ pub enum EvalClass {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn eval_class_derived_ord_works() {
-        let class1 = EvalClass::HighCard { high_rank: Rank::Ace };
-        let class2 = EvalClass::HighCard { high_rank: Rank::King };
+        let class1 = EvalClass::HighCard {
+            high_rank: Rank::Ace,
+        };
+        let class2 = EvalClass::HighCard {
+            high_rank: Rank::King,
+        };
         assert!(class1 > class2);
         let class3 = EvalClass::Pair { pair: Rank::Two };
         assert!(class3 > class1);

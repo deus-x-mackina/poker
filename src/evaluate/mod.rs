@@ -232,7 +232,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::HIGH_CARD).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::HIGH_CARD)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::HighCard { .. }
@@ -240,7 +244,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::PAIR).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::PAIR)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::Pair { .. }
@@ -248,7 +256,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::TWO_PAIR).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::TWO_PAIR)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::TwoPair { .. }
@@ -256,7 +268,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::THREE_OF_A_KIND).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::THREE_OF_A_KIND)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::ThreeOfAKind { .. }
@@ -264,7 +280,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::STRAIGHT).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::STRAIGHT)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::Straight { .. }
@@ -272,7 +292,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::FLUSH).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::FLUSH)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::Flush { .. }
@@ -280,7 +304,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::FULL_HOUSE).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::FULL_HOUSE)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::FullHouse { .. }
@@ -288,7 +316,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::FOUR_OF_A_KIND).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::FOUR_OF_A_KIND)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::FourOfAKind { .. }
@@ -296,7 +328,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::STRAIGHT_FLUSH).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::STRAIGHT_FLUSH)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::StraightFlush { .. }
@@ -304,7 +340,11 @@ mod tests {
 
         assert!(matches!(
             EVALUATOR
-                .evaluate(&Card::parse_to_iter(T::ROYAL_FLUSH).try_collect::<Vec<_>>().unwrap())
+                .evaluate(
+                    &Card::parse_to_iter(T::ROYAL_FLUSH)
+                        .try_collect::<Vec<_>>()
+                        .unwrap()
+                )
                 .unwrap()
                 .0,
             Meta::StraightFlush {

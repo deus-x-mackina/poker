@@ -119,7 +119,8 @@ impl fmt::Display for ParseCardError {
                 incorrect_char,
             } => write!(
                 f,
-                "Error parsing input '{}' as a Card: Invalid suit character '{}', expected one of [chsd]",
+                "Error parsing input '{}' as a Card: Invalid suit character '{}', expected one of \
+                 [chsd]",
                 original_input, incorrect_char
             ),
         }

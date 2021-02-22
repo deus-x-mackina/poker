@@ -2,8 +2,8 @@ use crate::evaluate::lookup_table;
 
 /// The rank of a hand, ranging from 1 (best) to 7462 (worst).
 /// This is not to be confused with a card rank! This number is mainly
-/// used internally to compare hands easily using integer values (if one hand rank < other hand rank,
-/// we know we have a *better* hand on the left!).
+/// used internally to compare hands easily using integer values (if one hand
+/// rank < other hand rank, we know we have a *better* hand on the left!).
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
 pub struct PokerHandRank(pub(crate) i16);
 
