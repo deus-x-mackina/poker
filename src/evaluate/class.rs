@@ -23,7 +23,7 @@ use crate::Rank;
 /// ```
 ///
 /// [`Eval::class`]: crate::Eval::class
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EvalClass {
     /// A high card, or no hand.
     HighCard {
@@ -76,4 +76,18 @@ pub enum EvalClass {
         /// The rank of the highest card in the straight flush.
         high_rank: Rank,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[test]
+    fn eval_class_derived_ord_works() {
+        let class1 = EvalClass::HighCard { high_rank: Rank::Ace };
+        let class2 = EvalClass::HighCard { high_rank: Rank::King };
+        assert!(class1 > class2);
+        let class3 = EvalClass::Pair { pair: Rank::Two };
+        assert!(class3 > class1);
+    }
 }
