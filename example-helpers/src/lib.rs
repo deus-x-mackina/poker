@@ -1,3 +1,5 @@
+//! Functionality shared across examples.
+
 use std::borrow::Cow;
 
 use colored::Colorize;
