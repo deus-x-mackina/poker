@@ -1,7 +1,10 @@
 use colored::Colorize;
-use example_helpers::ColorPrompt;
 use poker::{EvalClass, Evaluator};
 use rustyline::{ColorMode, Config, Editor};
+
+mod common;
+use common::ColorPrompt;
+
 
 fn main() {
     let eval = Evaluator::new();

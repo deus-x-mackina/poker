@@ -40,12 +40,9 @@ doc-comment = "0.3"
 # Examples
 rustyline = "7.1"
 colored = "2"
-example-helpers = { path = "example-helpers" }
+rustyline-derive = "0.4"
 # Benching
 criterion = "0.3"
-
-[workspace]
-members = ["example-helpers"]
 
 [[bench]]
 name = "evaluator"

@@ -1,11 +1,13 @@
 use std::collections::HashSet;
 
 use colored::Colorize;
-use example_helpers::ColorPrompt;
 use itertools::Itertools;
 use poker::{Card, EvalClass, Evaluator, Rank};
 use rand::prelude::*;
 use rustyline::{ColorMode, Config, Editor};
+
+mod common;
+use common::ColorPrompt;
 
 const STARTING_CREDITS: usize = 100;
 const MAX_WAGER: usize = 5;

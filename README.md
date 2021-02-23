@@ -56,7 +56,7 @@ poker = { version = "0.2", default-features = false }
 For readability, the `#[inline]` attribute has been removed from function
 declarations. In order to ensure `rustc` can make appropriate inlining and
 optimization decisions, remember to use link-time optimization in your release
-builds. This comes at the cost of slower compilation times. In your 
+builds. This comes at the cost of slower compilation times. In your
 `Cargo.toml`:
 
 ```toml
