@@ -5,7 +5,6 @@ use rustyline::{ColorMode, Config, Editor};
 mod common;
 use common::ColorPrompt;
 
-
 fn main() {
     let eval = Evaluator::new();
 
