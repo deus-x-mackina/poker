@@ -31,8 +31,8 @@ type DefaultHasher = BuildHasherDefault<FNV>;
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct LookupTable {
-    pub(crate) flush_lookup: HashMap<i32, Meta, DefaultHasher>,
-    pub(crate) unsuited_lookup: HashMap<i32, Meta, DefaultHasher>,
+    pub flush_lookup: HashMap<i32, Meta, DefaultHasher>,
+    pub unsuited_lookup: HashMap<i32, Meta, DefaultHasher>,
 }
 
 impl LookupTable {
