@@ -1,12 +1,5 @@
 use std::{collections::HashMap, hash::BuildHasherDefault};
 
-// Use FNV1aHasher64 on 64-bit systems. It hashed much faster.
-// SAFETY: Non-cryptographic algorithms can be used here because it improves hashing
-// performance and the hash tables are not available to mutate in the public interface.
-#[cfg(not(target_pointer_width = "64"))]
-use hashers::fnv::FNV1aHasher32 as FNV;
-#[cfg(target_pointer_width = "64")]
-use hashers::fnv::FNV1aHasher64 as FNV;
 use variter::VarIter;
 
 use self::constants::*;
@@ -16,7 +9,19 @@ use crate::{
     evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
 };
 
-type DefaultHasher = BuildHasherDefault<FNV>;
+// Use FNV1aHasher64 on 64-bit systems. It hashed much faster in benches.
+// SAFETY: Non-cryptographic algorithms can be used here because it improves
+// hashing performance and the hash tables are not available to mutate in the
+// public interface.
+cfg_if::cfg_if! {
+    if #[cfg(target_pointer_width = "64")] {
+        use hashers::fnv::FNV1aHasher64 as FNV1a;
+    } else {
+        use hashers::fnv::FNV1aHasher32 as FNV1a;
+    }
+}
+
+type DefaultHasher = BuildHasherDefault<FNV1a>;
 
 /// Stores information about looking up poker hands.
 ///
