@@ -1,6 +1,6 @@
 [package]
 name = "poker"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Daniel Mack"]
 edition = "2018"
 repository = "https://github.com/deus-x-mackina/poker"
@@ -15,11 +15,13 @@ readme = "README.md"
 # Some iterative algorithms
 itertools = "0.10"
 # Iterate through enum variants
-variter = { version = "0.2", default-features = false }
+variter = { version = "0.3", default-features = false }
 # Non-cryptographic hashing for faster lookup table generation
 hashers = "1"
 # Shuffle cards
 rand = { version = "0.8", optional = true }
+# Misc
+cfg-if = "1"
 
 [features]
 default = ["rand"]
@@ -42,7 +44,7 @@ rustyline = "7.1"
 colored = "2"
 rustyline-derive = "0.4"
 # Benching
-criterion = "0.3"
+criterion = { version = "0.3", features = ["html_reports"] }
 
 [[bench]]
 name = "evaluator"
