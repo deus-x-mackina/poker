@@ -7,7 +7,7 @@ use crate::{
     evaluate::lookup_table,
 };
 
-/// Originally from http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation.
+/// Originally from <http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation>.
 /// This differs from the implementation in Python because we use trailing
 /// zeroes.
 #[derive(Clone)]
