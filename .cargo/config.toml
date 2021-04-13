@@ -1,0 +1,3 @@
+[target.'cfg(target_os = "macos")']
+rustflags = ["-Csplit-debuginfo=unpacked"]
+
