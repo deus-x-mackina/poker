@@ -4,6 +4,7 @@ use variter::VarIter;
 use crate::{
     card::{rank::Rank, Card},
     constants::{INT_RANKS, PRIMES},
+    evaluate::lookup_table,
 };
 
 /// Originally from http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation.
@@ -75,14 +76,13 @@ pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
 
 /// Obtain the high card from a given set of rank bits bit-ORed together.
 pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
+    // We don't want to return an Ace as the high card if it's a five-high straight
+    if rank_bits == lookup_table::constants::STRAIGHTS[9] {
+        return Rank::Five;
+    }
     for i in INT_RANKS.rev() {
         if rank_bits & (1 << i) != 0 {
-            // We don't want to return an Ace as the high card if it's a five-high straight
-            return if i == 12 && (rank_bits & 0xF == 0b1111) {
-                Rank::Five
-            } else {
-                Rank::ALL_VARIANTS[i as usize]
-            };
+            return Rank::ALL_VARIANTS[i as usize];
         }
     }
     unreachable!();
