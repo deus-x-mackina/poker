@@ -137,14 +137,14 @@ impl Evaluator {
     /// ```
     pub fn evaluate<C: AsRef<[Card]>>(&self, cards: C) -> Result<Eval, EvalError> {
         let cards = cards.as_ref();
-        if !cards.all_unique() {
-            Err(EvalError::CardsNotUnique(cards.to_vec()))
-        } else {
+        if cards.all_unique() {
             match cards.len() {
                 x if x < 5 => Err(EvalError::InvalidHandSize(x)),
                 5 => Ok(self.five(cards)),
                 _ => Ok(self.six_plus(cards)),
             }
+        } else {
+            Err(EvalError::CardsNotUnique(cards.to_vec()))
         }
     }
 
