@@ -24,6 +24,7 @@
 //! [`Card`]: crate::Card
 //! [the `card` module`]: crate::card
 
+pub mod cached;
 mod class;
 mod eval;
 mod hand_rank;
@@ -66,7 +67,7 @@ use crate::{card::Card, error::EvalError, evaluate::lookup_table::LookupTable, e
 /// );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
-pub struct Evaluator(LookupTable);
+pub struct Evaluator(pub LookupTable);
 
 impl Evaluator {
     /// Create a new [`Evaluator`]. Try to call this method only once and share
