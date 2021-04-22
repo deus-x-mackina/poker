@@ -45,7 +45,7 @@ fn main() {
         hand.extend(deck.drain(0..5));
         let first_eval = eval.evaluate(&hand).unwrap();
         println!(
-            "\x1B[2J\x1B[1;1H{} {} {} {} {} ({})\n(1)    (2)    (3)    (4)    (5)",
+            "\x1B[2J\x1B[1;1H{} {} {} {} {} ({})\n (1)    (2)    (3)    (4)    (5)",
             &hand[0], &hand[1], &hand[2], &hand[3], &hand[4], first_eval
         );
 
@@ -112,7 +112,6 @@ fn main() {
 
 /// Attempt to read a wager from stdin. Returns None if the outer 'game loop
 /// needs to be broken.
-#[inline]
 fn get_wager(rl: &mut Editor<ColorPrompt>, credits: usize) -> Option<usize> {
     let message = format!("Enter a wager. (Credits: {}, max: {})", credits, MAX_WAGER);
     loop {
@@ -160,7 +159,6 @@ fn get_wager(rl: &mut Editor<ColorPrompt>, credits: usize) -> Option<usize> {
 
 /// Attempt to read swaps from stdin. Return None if the outer 'game loop needs
 /// to be broken.
-#[inline]
 fn get_swaps(rl: &mut Editor<ColorPrompt>) -> Option<Vec<usize>> {
     let message = "Enter the cards' numbers you wish to swap, if any.";
     loop {
