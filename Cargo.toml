@@ -40,7 +40,7 @@ lazy_static = "1.4"
 # Test - run code examples in *.md files
 doc-comment = "0.3"
 # Examples
-rustyline = "7.1"
+rustyline = "8"
 colored = "2"
 rustyline-derive = "0.4"
 # Benching
