@@ -50,8 +50,6 @@ rustyline-derive = "0.4"
 criterion = { version = "0.3", features = ["html_reports"] }
 
 [[bench]]
-name = "evaluator"
+name = "evaluation"
 harness = false
-
-[workspace]
-members = ["cache-table"]
+required-features = ["static_lookup"]
