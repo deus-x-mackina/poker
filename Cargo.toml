@@ -23,10 +23,11 @@ rand = { version = "0.8", optional = true }
 # Misc
 cfg-if = "1"
 # Table caching
-phf = "0.8"
+phf = { version = "0.8", optional = true }
 
 [features]
 default = ["rand"]
+static_lookup = ["phf"]
 
 [profile.release]
 lto = true
