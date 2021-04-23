@@ -24,12 +24,13 @@
 //! [`Card`]: crate::Card
 //! [the `card` module`]: crate::card
 
-pub mod cached;
 mod class;
 mod eval;
 mod hand_rank;
 mod lookup_table;
 mod meta;
+#[cfg(feature = "static_lookup")]
+pub mod static_lookup;
 mod utils;
 
 #[doc(inline)]
@@ -67,7 +68,7 @@ use crate::{card::Card, error::EvalError, evaluate::lookup_table::LookupTable, e
 /// );
 /// ```
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
-pub struct Evaluator(pub LookupTable);
+pub struct Evaluator(LookupTable);
 
 impl Evaluator {
     /// Create a new [`Evaluator`]. Try to call this method only once and share
@@ -195,7 +196,7 @@ mod tests {
     use super::*;
     use crate::{
         card::Card,
-        evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
+        evaluate::{hand_rank::PokerHandRank, utils},
     };
 
     lazy_static! {
@@ -210,149 +211,11 @@ mod tests {
             ints
         });
         assert_eq!(evals.len(), 7462);
-        (1..=7462).for_each(|i| {
+        (1..=7462).for_each(move |i| {
             assert!(evals
                 .iter()
-                .any(|meta| meta.hand_rank() == PokerHandRank(i)))
+                .any(|meta| meta.hand_rank() == PokerHandRank(i)));
         });
-    }
-
-    fn representative_hand_evaluates_correctly<T: RepresentativeHand>(hand_size: usize) {
-        let mut lens = Vec::with_capacity(11);
-        lens.push(T::HIGH_CARD.len());
-        lens.push(T::PAIR.len());
-        lens.push(T::TWO_PAIR.len());
-        lens.push(T::THREE_OF_A_KIND.len());
-        lens.push(T::STRAIGHT.len());
-        lens.push(T::FLUSH.len());
-        lens.push(T::FULL_HOUSE.len());
-        lens.push(T::FOUR_OF_A_KIND.len());
-        lens.push(T::STRAIGHT_FLUSH.len());
-        lens.push(T::ROYAL_FLUSH.len());
-        assert!(lens.into_iter().all(|l| l == hand_size));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::HIGH_CARD)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::HighCard { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::PAIR)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::Pair { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::TWO_PAIR)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::TwoPair { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::THREE_OF_A_KIND)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::ThreeOfAKind { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::STRAIGHT)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::Straight { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::FLUSH)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::Flush { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::FULL_HOUSE)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::FullHouse { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::FOUR_OF_A_KIND)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::FourOfAKind { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::STRAIGHT_FLUSH)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::StraightFlush { .. }
-        ));
-
-        assert!(matches!(
-            EVALUATOR
-                .evaluate(
-                    &Card::parse_to_iter(T::ROYAL_FLUSH)
-                        .try_collect::<Vec<_>>()
-                        .unwrap()
-                )
-                .unwrap()
-                .0,
-            Meta::StraightFlush {
-                hand_rank: PokerHandRank(1),
-                ..
-            }
-        ));
     }
 
     #[test]
@@ -370,8 +233,42 @@ mod tests {
         representative_hand_evaluates_correctly::<SevenCardHand>(7);
     }
 
+    fn representative_hand_evaluates_correctly<T: RepresentativeHand>(hand_size: usize) {
+        assert!(T::ALL_HANDS.iter().all(|&hand| hand.len() == hand_size));
+
+        let mut evaluations = T::ALL_HANDS.iter().map(|&hand| {
+            let cards = Card::parse_to_iter(hand)
+                .try_collect::<Box<_>>()
+                .unwrap();
+            EVALUATOR.evaluate(cards).unwrap()
+        });
+
+        assert!(evaluations.next().unwrap().is_high_card());
+
+        assert!(evaluations.next().unwrap().is_pair());
+
+        assert!(evaluations.next().unwrap().is_two_pair());
+
+        assert!(evaluations.next().unwrap().is_three_of_a_kind());
+
+        assert!(evaluations.next().unwrap().is_straight());
+
+        assert!(evaluations.next().unwrap().is_flush());
+
+        assert!(evaluations.next().unwrap().is_full_house());
+
+        assert!(evaluations.next().unwrap().is_four_of_a_kind());
+
+        assert!(evaluations.next().unwrap().is_straight_flush());
+
+        assert!(evaluations.next().unwrap().is_royal_flush());
+
+        assert!(evaluations.next().is_none());
+    }
+
     type Hand = &'static [&'static str];
-    trait RepresentativeHand {
+
+    pub trait RepresentativeHand {
         const HIGH_CARD: Hand;
         const PAIR: Hand;
         const TWO_PAIR: Hand;
@@ -382,9 +279,22 @@ mod tests {
         const FOUR_OF_A_KIND: Hand;
         const STRAIGHT_FLUSH: Hand;
         const ROYAL_FLUSH: Hand;
+
+        const ALL_HANDS: &'static [Hand] = &[
+            Self::HIGH_CARD,
+            Self::PAIR,
+            Self::TWO_PAIR,
+            Self::THREE_OF_A_KIND,
+            Self::STRAIGHT,
+            Self::FLUSH,
+            Self::FULL_HOUSE,
+            Self::FOUR_OF_A_KIND,
+            Self::STRAIGHT_FLUSH,
+            Self::ROYAL_FLUSH,
+        ];
     }
 
-    struct FiveCardHand;
+    pub struct FiveCardHand;
 
     #[rustfmt::skip]
     impl RepresentativeHand for FiveCardHand {
@@ -400,7 +310,7 @@ mod tests {
         const ROYAL_FLUSH: Hand = &["Th", "Jh", "Qh", "Kh", "Ah"];
     }
 
-    struct SixCardHand;
+    pub struct SixCardHand;
 
     #[rustfmt::skip]
     impl RepresentativeHand for SixCardHand {
@@ -416,7 +326,7 @@ mod tests {
         const ROYAL_FLUSH: &'static [&'static str] = &["Th", "Jh", "Qh", "Kh", "Ah", "2c"];
     }
 
-    struct SevenCardHand;
+    pub struct SevenCardHand;
 
     #[rustfmt::skip]
     impl RepresentativeHand for SevenCardHand {
