@@ -53,3 +53,6 @@ criterion = { version = "0.3", features = ["html_reports"] }
 name = "evaluation"
 harness = false
 required-features = ["static_lookup"]
+
+[package.metadata.docs.rs]
+all-features = true
