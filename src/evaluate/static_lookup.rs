@@ -1,15 +1,14 @@
-//! This module offers similar functionality to the [`Evaluator`] type, but
-//! [`evaluate`] comes as a free function. The main difference is that the
-//! [`evaluate`] uses a static lookup table, built into the library.
-//!
-//! It was decided to use a `static` lookup table rather than a `const`
-//! expression because the `static` lookup table actually resulted in a smaller
-//! library file. Nevertheless, using the `static_lookup` feature will greatly
-//! increase the size of the library file.
+//! This module is available under the non-default `static_lookup` feature and
+//! offers similar functionality to the [`Evaluator`] type, but [`evaluate`]
+//! comes as a free function. The main difference is that the [`evaluate`] uses
+//! a static lookup table, built into the library.
 //!
 //! Because the `static` lookup table doesn't allocate any memory on the heap,
 //! this module may become the foundation for providing `no_std` support in the
 //! future.
+//!
+//! **Warning:** Enabling the `static_lookup` feature will greatly increase the
+//! size of the resulting library.
 //!
 //! [`Evaluator`]: crate::Evaluator
 
@@ -271,9 +270,7 @@ mod tests {
     }
 
     #[test]
-    fn representative_six_card_hands() {
-        representative_hand_evaluates_correctly::<SixCardHand>();
-    }
+    fn representative_six_card_hands() { representative_hand_evaluates_correctly::<SixCardHand>(); }
 
     #[test]
     fn representative_seven_card_hands() {
