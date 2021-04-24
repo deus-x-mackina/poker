@@ -22,9 +22,12 @@ hashers = "1"
 rand = { version = "0.8", optional = true }
 # Misc
 cfg-if = "1"
+# Table caching
+phf = { version = "0.8", optional = true }
 
 [features]
 default = ["rand"]
+static_lookup = ["phf"]
 
 [profile.release]
 lto = true
@@ -47,5 +50,9 @@ rustyline-derive = "0.4"
 criterion = { version = "0.3", features = ["html_reports"] }
 
 [[bench]]
-name = "evaluator"
+name = "evaluation"
 harness = false
+required-features = ["static_lookup"]
+
+[package.metadata.docs.rs]
+all-features = true

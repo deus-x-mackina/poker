@@ -21,7 +21,7 @@ cfg_if::cfg_if! {
     }
 }
 
-type DefaultHasher = BuildHasherDefault<FNV1a>;
+pub type DefaultHasher = BuildHasherDefault<FNV1a>;
 
 /// Stores information about looking up poker hands.
 ///
