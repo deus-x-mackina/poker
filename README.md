@@ -36,19 +36,26 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.2"
+poker = "0.3"
 ```
 
 ## Features
 
-`poker` currently has one feature, depending on
-the [`rand`](https://crates.io/crates/rand) crate, in order to shuffle generated
-decks. This can easily be disabled by disabling default features in your
-`Cargo.toml` file:
+`poker` currently has two features. One depends on the [`rand`](https://crates.io/crates/rand) crate,
+in order to shuffle generated decks. This is enabled by default.
+
+The second feature, which is also not enabled by default is `static_lookup`. Enabling
+this feature opens up the `poker::evaluate::static_lookup` module, which contains
+the free `evauluate` function. It works similar to `Evaluator::evaluate`, but
+semantically it uses a static data structure that does not rely on heap allocations.
+
+There is no real benefit to using the feature yet, but it is an experimental first step
+for possible `no_std` support in the future. To enable this feature:
 
 ```toml
 [dependencies]
-poker = { version = "0.2", default-features = false }
+# To use without `rand`, add `default-features = false`
+poker = { version = "0.3", features = ["static_lookup"] }
 ```
 
 ## A Note on Performance
@@ -95,7 +102,7 @@ jacks-or-better
 You can also run the examples through a cloned git repository.
 
 ```bash
-git clone https://github.com/deus-x-mackina/poker
+git clone https://github.com/deus-x-mackina/poker.git
 cd poker
 cargo run --example=poker-repl
 cargo run --example=jacks-or-better
