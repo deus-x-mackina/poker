@@ -34,8 +34,8 @@
 //! ```
 //! [`treys`]: https://github.com/ihendley/treys
 
-#![forbid(unsafe_code, missing_docs)]
-#![doc(html_root_url = "https://docs.rs/poker/0.2")]
+#![forbid(unsafe_code)]
+#![warn(missing_docs)]
 
 #[cfg(doctest)]
 doc_comment::doctest!("../README.md");
