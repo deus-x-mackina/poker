@@ -1,5 +1,4 @@
-use std::{collections::HashMap, hash::BuildHasherDefault};
-
+use hashbrown::HashMap;
 use variter::VarIter;
 
 use self::constants::*;
@@ -8,20 +7,6 @@ use crate::{
     constants::{INT_RANKS, PRIMES},
     evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
 };
-
-// Use FNV1aHasher64 on 64-bit systems. It hashed much faster in benches.
-// SAFETY: Non-cryptographic algorithms can be used here because it improves
-// hashing performance and the hash tables are not available to mutate in the
-// public interface.
-cfg_if::cfg_if! {
-    if #[cfg(target_pointer_width = "64")] {
-        use hashers::fnv::FNV1aHasher64 as FNV1a;
-    } else {
-        use hashers::fnv::FNV1aHasher32 as FNV1a;
-    }
-}
-
-pub type DefaultHasher = BuildHasherDefault<FNV1a>;
 
 /// Stores information about looking up poker hands.
 ///
@@ -36,15 +21,15 @@ pub type DefaultHasher = BuildHasherDefault<FNV1a>;
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct LookupTable {
-    pub flush_lookup: HashMap<i32, Meta, DefaultHasher>,
-    pub unsuited_lookup: HashMap<i32, Meta, DefaultHasher>,
+    pub flush_lookup: HashMap<i32, Meta>,
+    pub unsuited_lookup: HashMap<i32, Meta>,
 }
 
 impl LookupTable {
     pub fn new() -> Self {
         let mut table = Self {
-            flush_lookup: HashMap::with_capacity_and_hasher(6175, DefaultHasher::default()),
-            unsuited_lookup: HashMap::with_capacity_and_hasher(1287, DefaultHasher::default()),
+            flush_lookup: HashMap::with_capacity(6175),
+            unsuited_lookup: HashMap::with_capacity(1287),
         };
         table.flushes_straights_high_cards();
         table.multiples();
