@@ -150,118 +150,25 @@ mod tests {
     }
 
     fn representative_hand_evaluates_correctly<T: RepresentativeHand>() {
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::HIGH_CARD)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::HighCard { .. }
-        ));
+        let mut evaluations = T::ALL_HANDS.iter().map(|&hand| {
+            let cards = Card::parse_to_iter(hand)
+                .try_collect::<Box<_>>()
+                .unwrap();
 
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::PAIR)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::Pair { .. }
-        ));
+            evaluate(cards).unwrap()
+        });
 
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::TWO_PAIR)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::TwoPair { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::THREE_OF_A_KIND)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::ThreeOfAKind { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::STRAIGHT)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::Straight { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::FLUSH)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::Flush { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::FULL_HOUSE)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::FullHouse { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::FOUR_OF_A_KIND)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::FourOfAKind { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::STRAIGHT_FLUSH)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::StraightFlush { .. }
-        ));
-
-        assert!(matches!(
-            evaluate(
-                &Card::parse_to_iter(T::ROYAL_FLUSH)
-                    .try_collect::<Vec<_>>()
-                    .unwrap()
-            )
-            .unwrap()
-            .0,
-            Meta::StraightFlush {
-                hand_rank: PokerHandRank(1),
-                ..
-            }
-        ));
+        assert!(evaluations.next().unwrap().is_high_card());
+        assert!(evaluations.next().unwrap().is_pair());
+        assert!(evaluations.next().unwrap().is_two_pair());
+        assert!(evaluations.next().unwrap().is_three_of_a_kind());
+        assert!(evaluations.next().unwrap().is_straight());
+        assert!(evaluations.next().unwrap().is_flush());
+        assert!(evaluations.next().unwrap().is_full_house());
+        assert!(evaluations.next().unwrap().is_four_of_a_kind());
+        assert!(evaluations.next().unwrap().is_straight_flush());
+        assert!(evaluations.next().unwrap().is_royal_flush());
+        assert!(evaluations.next().is_none());
     }
 
     #[test]
