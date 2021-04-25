@@ -114,5 +114,5 @@ impl TryFrom<char> for Suit {
 }
 
 impl fmt::Display for Suit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_char(self.as_pretty_char()) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_char(self.as_pretty_char()) }
 }

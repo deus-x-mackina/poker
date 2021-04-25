@@ -69,7 +69,7 @@ impl Eval {
 }
 
 impl fmt::Display for Eval {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { self.0.fmt(f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { self.0.fmt(f) }
 }
 
 #[cfg(test)]
