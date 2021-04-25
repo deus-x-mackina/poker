@@ -186,5 +186,5 @@ impl TryFrom<char> for Rank {
 }
 
 impl fmt::Display for Rank {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { f.write_char(self.as_char()) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { f.write_char(self.as_char()) }
 }

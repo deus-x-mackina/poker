@@ -424,7 +424,7 @@ impl fmt::Debug for Card {
 }
 
 impl fmt::Display for Card {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[ {}{} ]", self.rank(), self.suit())
     }
 }

@@ -97,7 +97,7 @@ pub enum ParseCardError {
 }
 
 impl fmt::Display for ParseCardError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidLength { original_input } => write!(
                 f,
@@ -184,7 +184,7 @@ pub enum EvalError {
 }
 
 impl fmt::Display for EvalError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::CardsNotUnique(cards) => {
                 let dups: String = cards
