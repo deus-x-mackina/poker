@@ -128,7 +128,6 @@ mod tests {
         card::Card,
         evaluate::{
             hand_rank::PokerHandRank,
-            meta::Meta,
             tests::{FiveCardHand, RepresentativeHand, SevenCardHand, SixCardHand},
             utils,
         },
