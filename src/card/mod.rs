@@ -60,7 +60,7 @@ use std::{
     convert::{TryFrom, TryInto},
     fmt,
     hash::Hash,
-    iter::FromIterator,
+    iter::{FromIterator, FusedIterator},
     str::FromStr,
 };
 
@@ -369,9 +369,7 @@ impl Card {
         S: IntoIterator<Item = T>,
         T: AsRef<str>,
     {
-        ParseToIter {
-            iter: strings.into_iter().map(|s| s.as_ref().parse()),
-        }
+        ParseToIter(strings.into_iter().map(|s| s.as_ref().parse()))
     }
 }
 
@@ -435,14 +433,32 @@ impl fmt::Display for Card {
 /// collection, or fail upon the first error encountered.
 #[derive(Debug, Clone)]
 #[must_use = "iterators are lazy and do nothing unless consumed"]
-pub struct ParseToIter<I> {
-    iter: I,
+pub struct ParseToIter<I>(I);
+
+impl<I: Iterator> Iterator for ParseToIter<I> {
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> { self.0.next() }
+
+    fn size_hint(&self) -> (usize, Option<usize>) { self.0.size_hint() }
+
+    fn fold<B, F>(self, init: B, f: F) -> B
+    where
+        Self: Sized,
+        F: FnMut(B, Self::Item) -> B,
+    {
+        self.0.fold(init, f)
+    }
 }
 
-impl<I> std::ops::Deref for ParseToIter<I> {
-    type Target = I;
+impl<I: FusedIterator> FusedIterator for ParseToIter<I> {}
 
-    fn deref(&self) -> &Self::Target { &self.iter }
+impl<I: ExactSizeIterator> ExactSizeIterator for ParseToIter<I> {
+    fn len(&self) -> usize { self.0.len() }
+}
+
+impl<I: DoubleEndedIterator> DoubleEndedIterator for ParseToIter<I> {
+    fn next_back(&mut self) -> Option<Self::Item> { self.0.next_back() }
 }
 
 impl<I, T, E> ParseToIter<I>
@@ -452,8 +468,12 @@ where
     /// A shortcut over calling `collect::<Result<_, _>, _>()`. Inspired by the
     /// [`itertools`] crate.
     ///
+    /// # Errors
+    /// If any item in this iterator yields an `Err` variant, that `Err` is
+    /// returned.
+    ///
     /// [`itertools`]: itertools::Itertools::try_collect
-    pub fn try_collect<C: FromIterator<T>>(self) -> Result<C, E> { self.iter.collect() }
+    pub fn try_collect<C: FromIterator<T>>(self) -> Result<C, E> { self.0.collect() }
 }
 
 #[cfg(test)]
