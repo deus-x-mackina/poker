@@ -272,59 +272,6 @@ impl Card {
         cards
     }
 
-    /// Attempt to parse a [`Vec`] of [`Card`]s from an [`Iterator`] that yields
-    /// items which are `AsRef<str>`; [`String`] or `&str` work fine!
-    ///
-    /// # Errors
-    ///
-    /// This function **will** fail with a [`ParseCardError`] if one of the
-    /// strings encountered is not:
-    /// - exactly two characters in length
-    /// - contains one of '`23456789TJQKA`' followed by one of '`chsd`'. This is
-    ///   case-sensitive!
-    ///
-    /// One invalid string is enough to make the entire function fail, and the
-    /// implementation is short-circuiting. This means that the function
-    /// will return as soon as an error is encountered.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// # #![allow(deprecated)]
-    /// use poker::{Card, Rank, Suit};
-    /// let card_strings = ["Td", "Qc"];
-    /// let parsed_cards = Card::parse_to_vec(&card_strings).expect("couldn't parse strings");
-    /// assert_eq!(
-    ///     parsed_cards,
-    ///     [
-    ///         Card::new(Rank::Ten, Suit::Diamonds),
-    ///         Card::new(Rank::Queen, Suit::Clubs)
-    ///     ]
-    /// );
-    /// ```
-    #[deprecated(
-        since = "0.2.0",
-        note = "please use `Card::parse_to_iter().try_collect::<Vec<_>>()` instead. This will \
-                disappear soon."
-    )]
-    pub fn parse_to_vec<S, T>(strings: S) -> Result<Vec<Self>, ParseCardError>
-    where
-        S: IntoIterator<Item = T>,
-        T: AsRef<str>,
-    {
-        let strings = strings.into_iter();
-        let size = {
-            let (lower, upper) = strings.size_hint();
-            upper.unwrap_or(lower)
-        };
-        let mut vec = Vec::with_capacity(size);
-        for string in strings {
-            let card = string.as_ref().parse()?;
-            vec.push(card);
-        }
-        Ok(vec)
-    }
-
     /// From an iterator that yields strings, return a new [`Iterator`] that
     /// yields `Result<Card, ParseCardError>`. Similar to
     /// [`Card::parse_to_vec`], but does not allocate a vector by default. The
