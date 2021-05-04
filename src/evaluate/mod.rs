@@ -24,6 +24,9 @@
 //! [`Card`]: crate::Card
 //! [the `card` module`]: crate::card
 
+#[macro_use]
+mod macros;
+
 mod class;
 mod eval;
 mod hand_rank;
@@ -139,51 +142,18 @@ impl Evaluator {
     /// ```
     pub fn evaluate<C: AsRef<[Card]>>(&self, cards: C) -> Result<Eval, EvalError> {
         let cards = cards.as_ref();
-        if cards.all_unique() {
-            match cards.len() {
-                x if x < 5 => Err(EvalError::InvalidHandSize(x)),
-                5 => Ok(self.five(cards)),
-                _ => Ok(self.six_plus(cards)),
-            }
-        } else {
-            Err(EvalError::CardsNotUnique(cards.to_vec()))
-        }
+        evaluation_impl!(@main, cards, self.five(cards), self.six_plus(cards))
     }
 
     /// Evaluate five cards only
     fn five(&self, cards: &[Card]) -> Eval {
-        debug_assert_eq!(cards.len(), 5);
-        let detect_flush = cards
-            .iter()
-            .fold(0xF000, |acc, card| acc & card.unique_integer())
-            != 0;
-
-        if detect_flush {
-            let bit_rank_or = cards
-                .iter()
-                .fold(0, |acc, card| acc | card.unique_integer())
-                >> 16;
-            let prime = utils::prime_product_from_rank_bits(bit_rank_or as i16);
-            Eval(self.0.flush_lookup[&prime])
-        } else {
-            let prime = utils::prime_product_from_hand(cards);
-            Eval(self.0.unsuited_lookup[&prime])
-        }
+        evaluation_impl!(@five, cards, self.0.flush_lookup, self.0.unsuited_lookup)
     }
 
     /// Evaluate six or more cards by running combinations of five cards and
     /// keeping the best result.
     fn six_plus(&self, cards: &[Card]) -> Eval {
-        debug_assert!(cards.len() > 5);
-        let mut current_max = Eval::WORST;
-        let all_five_card_combos = utils::combinations_generator(cards.iter().cloned(), 5);
-        for combo in all_five_card_combos {
-            let score = self.five(&combo);
-            if score > current_max {
-                current_max = score;
-            }
-        }
-        current_max
+        evaluation_impl!(@six_plus, cards, |combo| self.five(combo))
     }
 }
 
