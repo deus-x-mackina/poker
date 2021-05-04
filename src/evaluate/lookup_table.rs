@@ -1,4 +1,4 @@
-use hashbrown::HashMap;
+use rustc_hash::{FxHashMap, FxHasher};
 use variter::VarIter;
 
 use self::constants::*;
@@ -7,6 +7,8 @@ use crate::{
     constants::{INT_RANKS, PRIMES},
     evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
 };
+
+use std::hash::BuildHasherDefault;
 
 /// Stores information about looking up poker hands.
 ///
@@ -21,15 +23,15 @@ use crate::{
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct LookupTable {
-    pub flush_lookup: HashMap<i32, Meta>,
-    pub unsuited_lookup: HashMap<i32, Meta>,
+    pub flush_lookup: FxHashMap<i32, Meta>,
+    pub unsuited_lookup: FxHashMap<i32, Meta>,
 }
 
 impl LookupTable {
     pub fn new() -> Self {
         let mut table = Self {
-            flush_lookup: HashMap::with_capacity(6175),
-            unsuited_lookup: HashMap::with_capacity(1287),
+            flush_lookup: FxHashMap::with_capacity_and_hasher(6175, BuildHasherDefault::<FxHasher>::default()),
+            unsuited_lookup: FxHashMap::with_capacity_and_hasher(1287, BuildHasherDefault::<FxHasher>::default()),
         };
         table.flushes_straights_high_cards();
         table.multiples();

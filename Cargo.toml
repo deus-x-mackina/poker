@@ -17,7 +17,7 @@ itertools = "0.10"
 # Iterate through enum variants
 variter = { version = "0.3", default-features = false }
 # Faster hashmaps
-hashbrown = "0.11"
+rustc-hash = "1"
 # Shuffle cards
 rand = { version = "0.8", optional = true }
 # Misc
