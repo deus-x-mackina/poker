@@ -49,11 +49,11 @@ impl LookupTable {
         // i.e., there are no pairs, trips, quads, etc.
         // We are going to add each combination that isn't a straight into the
         // `not_straights` vector
-        let mut gen = utils::bit_sequence_generator(0b11111);
+        let mut gen = utils::BitSequence::new(0b11111);
 
         // info: We statically calculated all straights in the `STRAIGHTS` constant
         for _ in 0..1286 {
-            let bits = gen.next().unwrap();
+            let bits = gen.get_next();
             let mut not_straight = true;
             for &straight in &STRAIGHTS {
                 // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add

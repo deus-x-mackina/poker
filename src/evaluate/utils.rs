@@ -10,36 +10,31 @@ use crate::{
 /// Originally from <http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation>.
 /// This differs from the implementation in Python because we use trailing
 /// zeroes.
-#[derive(Clone)]
-struct BitSequence {
+#[derive(Debug, Clone)]
+pub struct BitSequence {
     bits: i16,
     t: i16,
     next_bits: i16,
 }
 
 impl BitSequence {
-    const fn new(bits: i16) -> Self {
+    pub const fn new(bits: i16) -> Self {
         Self {
             bits,
             t: 0,
             next_bits: 0,
         }
     }
-}
 
-impl Iterator for BitSequence {
-    type Item = i16;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    pub fn get_next(&mut self) -> i16 {
         self.t = self.bits | self.bits.wrapping_sub(1);
         self.next_bits = self.t.wrapping_add(1);
-        self.next_bits |= ((!self.t & -!self.t) - 1) >> self.bits.trailing_zeros().wrapping_add(1);
+        self.next_bits |=
+            ((!self.t & (!self.t).wrapping_neg()).wrapping_sub(1)) >> self.bits.trailing_zeros().wrapping_add(1);
         self.bits = self.next_bits;
-        Some(self.next_bits)
+        self.next_bits
     }
 }
-
-pub fn bit_sequence_generator(bits: i16) -> impl Iterator<Item = i16> { BitSequence::new(bits) }
 
 /// Return the combinations of size `r` from the iterable's items.
 pub fn combinations_generator<I>(iterable: I, r: usize) -> impl Iterator<Item = Vec<I::Item>>
@@ -105,7 +100,7 @@ mod tests {
     #[test]
     fn bit_sequence_generator_works() {
         let some_number = 0b10011;
-        let mut xs = bit_sequence_generator(some_number);
+        let mut xs = BitSequence::new(some_number);
 
         let mut next_check = move |bin: i16| {
             assert_eq!(xs.next().unwrap(), bin);
