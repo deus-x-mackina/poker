@@ -13,19 +13,22 @@ macro_rules! evaluation_impl {
     }};
 
     (@five, $cards:expr, $flush:expr, $unsuited:expr) => {{
-        use $crate::evaluate::{utils, eval::Eval};
+        use $crate::evaluate::{eval::Eval, utils};
 
         debug_assert_eq!($cards.len(), 5);
-        let detect_flush = $cards
-            .iter()
-            .fold(0xF000, |acc, card| acc & card.unique_integer())
-            != 0;
+
+        let uniques = [
+            $cards[0].unique_integer(),
+            $cards[1].unique_integer(),
+            $cards[2].unique_integer(),
+            $cards[3].unique_integer(),
+            $cards[4].unique_integer(),
+        ];
+
+        let detect_flush = uniques.iter().fold(0xF000, |acc, &x| acc & x) != 0;
 
         if detect_flush {
-            let bit_rank_or = $cards
-                .iter()
-                .fold(0, |acc, card| acc | card.unique_integer())
-                >> 16;
+            let bit_rank_or = uniques.iter().fold(0, |acc, &x| acc | x) >> 16;
             let prime = utils::prime_product_from_rank_bits(bit_rank_or as i16);
             Eval($flush[&prime])
         } else {
@@ -35,7 +38,7 @@ macro_rules! evaluation_impl {
     }};
 
     (@six_plus, $cards:expr, $closure:expr) => {{
-        use $crate::evaluate::{utils, eval::Eval};
+        use $crate::evaluate::{eval::Eval, utils};
 
         debug_assert!($cards.len() > 5);
         let mut current_max = Eval::WORST;
@@ -48,8 +51,4 @@ macro_rules! evaluation_impl {
         }
         current_max
     }};
-
-    (@six_plus_dyn, $this:expr, $f:ident, $combos:expr) => {
-        $this.$f(&$combos)
-    };
 }
