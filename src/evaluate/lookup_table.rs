@@ -121,18 +121,18 @@ impl LookupTable {
             );
 
             // We increment our values as in the next loop we consider the next-worse hand.
-            rank_suited += 1;
-            rank_unsuited += 1;
+            rank_suited = rank_suited.wrapping_add(1);
+            rank_unsuited = rank_unsuited.wrapping_add(1);
         }
 
         // Now, we work with our `not_straights`.
 
         // If suited, we have a flush, which is starts just worse than the worst full
         // house
-        rank_suited = WORST_FULL_HOUSE + 1;
+        rank_suited = WORST_FULL_HOUSE.wrapping_add(1);
 
         // If unsuited, we start just worse than the worst pair
-        rank_unsuited = WORST_PAIR + 1;
+        rank_unsuited = WORST_PAIR.wrapping_add(1);
 
         // Flushes and high cards
         // We reverse `not_straights` before looping because we generated the worst
@@ -163,8 +163,8 @@ impl LookupTable {
             );
 
             // Increment our values to consider the next worst hand
-            rank_suited += 1;
-            rank_unsuited += 1;
+            rank_suited = rank_suited.wrapping_add(1);
+            rank_unsuited = rank_unsuited.wrapping_add(1);
         }
     }
 
@@ -181,7 +181,7 @@ impl LookupTable {
         // extra card, the kicker, is left, which can be one of the other eleven
         // card ranks. We start our rank at just worse than the worst straight
         // flush
-        let mut rank = WORST_STRAIGHT_FLUSH + 1;
+        let mut rank = WORST_STRAIGHT_FLUSH.wrapping_add(1);
 
         // First, select our rank that there will be 4x
         for quad in backwards_ranks.clone() {
@@ -190,7 +190,8 @@ impl LookupTable {
             for k in kickers {
                 // Get the prime product by hand, using `pow` if/when the card is present more
                 // than once
-                product = PRIMES[quad as usize].wrapping_pow(4) * PRIMES[k as usize];
+                product = PRIMES[quad as usize].wrapping_pow(4) // 4x the quad card
+                    .wrapping_mul(PRIMES[k as usize]); // 1x the kicker
 
                 // Map the product to the appropriate hand
                 self.unsuited_lookup.insert(
@@ -200,13 +201,13 @@ impl LookupTable {
                         quads: Rank::ALL_VARIANTS[quad as usize],
                     },
                 );
-                rank += 1;
+                rank = rank.wrapping_add(1);
             }
         }
 
         // Full house
         // We have one three of a kind (trips) and one (pair)
-        rank = WORST_FOUR_OF_A_KIND + 1;
+        rank = WORST_FOUR_OF_A_KIND.wrapping_add(1);
         // We select our trips rank...
         for trips in backwards_ranks.clone() {
             // ...and select our pair rank
@@ -214,8 +215,8 @@ impl LookupTable {
             for pr in pair_ranks {
                 // And we calculate the prime product using power of 3 for the 3x rank and power
                 // of 2 for the 2x rank
-                product =
-                    PRIMES[trips as usize].wrapping_pow(3) * PRIMES[pr as usize].wrapping_pow(2);
+                product = PRIMES[trips as usize].wrapping_pow(3) // 3x trips
+                    .wrapping_mul(PRIMES[pr as usize].wrapping_pow(2)); // 2x pair
                 self.unsuited_lookup.insert(
                     product,
                     Meta::FullHouse {
@@ -224,13 +225,13 @@ impl LookupTable {
                         trips: Rank::ALL_VARIANTS[trips as usize],
                     },
                 );
-                rank += 1;
+                rank = rank.wrapping_add(1);
             }
         }
 
         // Three of a kind
         // One 3x rank and two unique kickers
-        rank = WORST_STRAIGHT + 1;
+        rank = WORST_STRAIGHT.wrapping_add(1);
         for trips in backwards_ranks.clone() {
             let kickers = backwards_ranks.clone().filter(|&kicker| kicker != trips);
             // We want every combination of two kickers
@@ -242,7 +243,10 @@ impl LookupTable {
 
                 // Calculate our prime product with power of 3 for the trips and simply
                 // multiply in the two kickers' primes
-                product = PRIMES[trips as usize].wrapping_pow(3) * PRIMES[c1] * PRIMES[c2];
+                product = PRIMES[trips as usize].wrapping_pow(3) // 3x trips
+                    .wrapping_mul(PRIMES[c1]) // 1x first kicker
+                    .wrapping_mul(PRIMES[c2]); // 1x second kicker
+
                 self.unsuited_lookup.insert(
                     product,
                     Meta::ThreeOfAKind {
@@ -250,13 +254,13 @@ impl LookupTable {
                         trips: Rank::ALL_VARIANTS[trips as usize],
                     },
                 );
-                rank += 1;
+                rank = rank.wrapping_add(1);
             }
         }
 
         // Two pair
         // Two unique 2x cards and one unique kicker
-        rank = WORST_THREE_OF_A_KIND + 1;
+        rank = WORST_THREE_OF_A_KIND.wrapping_add(1);
 
         // We want want every combination of two card ranks together to consider as our
         // two pair ranks
@@ -273,9 +277,9 @@ impl LookupTable {
 
             for kicker in kickers {
                 // Product is power of two for our two pair ranks, multiplied by kicker
-                product = PRIMES[pair1 as usize].wrapping_pow(2)
-                    * PRIMES[pair2 as usize].wrapping_pow(2)
-                    * PRIMES[kicker as usize];
+                product = PRIMES[pair1 as usize].wrapping_pow(2) // 2x first pair
+                    .wrapping_mul(PRIMES[pair2 as usize].wrapping_pow(2)) // 2x second pair
+                    .wrapping_mul(PRIMES[kicker as usize]); // 1x kicker
                 self.unsuited_lookup.insert(
                     product,
                     Meta::TwoPair {
@@ -284,13 +288,13 @@ impl LookupTable {
                         low_pair: Rank::ALL_VARIANTS[pair2 as usize],
                     },
                 );
-                rank += 1;
+                rank = rank.wrapping_add(1);
             }
         }
 
         // Pair
         // 1 pair rank and three unique kickers
-        rank = WORST_TWO_PAIR + 1;
+        rank = WORST_TWO_PAIR.wrapping_add(1);
         for pair_rank in backwards_ranks.clone() {
             let kickers = backwards_ranks
                 .clone()
@@ -306,10 +310,10 @@ impl LookupTable {
 
                 // Our product is the pair rank's prime to the power of two times the kickers'
                 // primes
-                product = PRIMES[pair_rank as usize].wrapping_pow(2)
-                    * PRIMES[k1]
-                    * PRIMES[k2]
-                    * PRIMES[k3];
+                product = PRIMES[pair_rank as usize].wrapping_pow(2) // 2x pair
+                    .wrapping_mul(PRIMES[k1]) // 1x first kicker
+                    .wrapping_mul(PRIMES[k2]) // 1x second kicker
+                    .wrapping_mul(PRIMES[k3]); // 1x third kicker
                 self.unsuited_lookup.insert(
                     product,
                     Meta::Pair {
@@ -317,7 +321,7 @@ impl LookupTable {
                         pair: Rank::ALL_VARIANTS[pair_rank as usize],
                     },
                 );
-                rank += 1;
+                rank = rank.wrapping_add(1);
             }
         }
 

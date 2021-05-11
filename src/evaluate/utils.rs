@@ -47,12 +47,12 @@ where
 
 /// Calculate a hand's prime product by using it's bit rank representation.
 pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
-    let mut product = 1;
+    let mut product: i32 = 1;
     for i in INT_RANKS {
         // Check to see if the bit for a given rank is turned on
         if rank_bits & (1 << i) != 0 {
             // If so, we multiply in the prime number corresponding to that rank
-            product *= PRIMES[i as usize]
+            product = product.wrapping_mul(PRIMES[i as usize]);
         }
     }
     product
@@ -61,10 +61,10 @@ pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
 /// Calculate a hand's prime product if an entire `Card` representation is
 /// available.
 pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
-    let mut product = 1;
+    let mut product: i32 = 1;
     for &card in hand {
         // Multiply in the first 8 bits corresponding to the card's prime number
-        product *= card.unique_integer() & 0xFF
+        product = product.wrapping_mul(card.unique_integer() & 0xFF);
     }
     product
 }
@@ -103,7 +103,7 @@ mod tests {
         let mut xs = BitSequence::new(some_number);
 
         let mut next_check = move |bin: i16| {
-            assert_eq!(xs.next().unwrap(), bin);
+            assert_eq!(xs.get_next(), bin);
         };
 
         next_check(0b00010101);
