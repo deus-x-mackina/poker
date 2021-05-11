@@ -1,6 +1,8 @@
 //! Private, useful type extension traits used throughout the crate.
 
-use std::{collections::HashSet, hash::Hash};
+use std::hash::{BuildHasherDefault, Hash};
+
+use rustc_hash::{FxHashSet, FxHasher};
 
 /// A trait used to verify if all elements of a collection are unique from each
 /// other.
@@ -20,7 +22,10 @@ where
             let (lower, upper) = iter.size_hint();
             upper.unwrap_or(lower)
         };
-        let mut unique = HashSet::with_capacity(possible_size);
+        let mut unique = FxHashSet::with_capacity_and_hasher(
+            possible_size,
+            BuildHasherDefault::<FxHasher>::default(),
+        );
         iter.all(move |item| unique.insert(item))
     }
 }
