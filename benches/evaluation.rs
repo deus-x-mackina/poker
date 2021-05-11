@@ -1,4 +1,4 @@
-use criterion::{Criterion, criterion_group, criterion_main};
+use criterion::{criterion_group, criterion_main, Criterion};
 use itertools::Itertools;
 use poker::{evaluate::static_lookup, Card, Evaluator};
 
@@ -22,9 +22,7 @@ fn bench_eval(c: &mut Criterion) {
         }
     };
 
-    group.bench_function("dynamic", |b| {
-        b.iter(&routine)
-    });
+    group.bench_function("dynamic", |b| b.iter(&routine));
 
     group.bench_function("static", |b| {
         b.iter(|| {
@@ -37,10 +35,6 @@ fn bench_eval(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(
-    benches,
-    bench_evaluator,
-    bench_eval
-);
+criterion_group!(benches, bench_evaluator, bench_eval);
 
 criterion_main!(benches);

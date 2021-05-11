@@ -82,20 +82,21 @@ fn five(cards: &[Card]) -> Eval {
     evaluation_impl!(@five, cards, statics::FLUSH_LOOKUP, statics::UNSUITED_LOOKUP)
 }
 
-fn six_plus(cards: &[Card]) -> Eval {
-    evaluation_impl!(@six_plus, cards, |combo| five(combo))
-}
+fn six_plus(cards: &[Card]) -> Eval { evaluation_impl!(@six_plus, cards, |combo| five(combo)) }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
 
-    use super::*;
+    use super::{
+        evaluate,
+        statics::{FLUSH_LOOKUP, UNSUITED_LOOKUP},
+    };
     use crate::{
         card::Card,
         evaluate::{
             hand_rank::PokerHandRank,
-            tests::{FiveCardHand, RepresentativeHand, SevenCardHand, SixCardHand},
+            tests::{FiveCardHand, RepresentativeHand, SevenCardHand, SixCardHand, EVALUATOR},
             utils,
         },
     };
@@ -117,9 +118,7 @@ mod tests {
 
     fn representative_hand_evaluates_correctly<T: RepresentativeHand>() {
         let mut evaluations = T::ALL_HANDS.iter().map(|&hand| {
-            let cards = Card::parse_to_iter(hand)
-                .try_collect::<Box<_>>()
-                .unwrap();
+            let cards = Card::parse_to_iter(hand).try_collect::<Box<_>>().unwrap();
 
             evaluate(cards).unwrap()
         });
@@ -148,5 +147,29 @@ mod tests {
     #[test]
     fn representative_seven_card_hands() {
         representative_hand_evaluates_correctly::<SevenCardHand>();
+    }
+
+    #[test]
+    fn ensure_identical_tables() {
+        macro_rules! fail {
+            () => {
+                "The dynamic and static lookup tables contain different data. This is a bug! The \
+     static table may need to be regenerated."
+            };
+        }
+
+        // Flushes
+        let fl = &EVALUATOR.0.flush_lookup;
+        for (key, value) in FLUSH_LOOKUP {
+            assert_eq!(&fl[key], value, fail!());
+        }
+        assert_eq!(fl.len(), FLUSH_LOOKUP.len(), fail!());
+
+        // Unsuited
+        let us = &EVALUATOR.0.unsuited_lookup;
+        for (key, value) in UNSUITED_LOOKUP {
+            assert_eq!(&us[key], value, fail!());
+        }
+        assert_eq!(us.len(), UNSUITED_LOOKUP.len(), fail!());
     }
 }

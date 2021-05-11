@@ -163,9 +163,9 @@ macro_rules! cards {
 #[macro_export]
 macro_rules! box_cards {
     ($card_slice:expr, $($card_slices:expr),+ $(,)?) => {
-        $card_slice.iter().cloned()
+        $card_slice.iter().copied()
             $(
-                .chain($card_slices.iter().cloned())
+                .chain($card_slices.iter().copied())
             )+
             .collect::<Box<[$crate::Card]>>()
     };

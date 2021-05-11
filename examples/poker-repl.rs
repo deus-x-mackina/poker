@@ -1,18 +1,14 @@
 use colored::Colorize;
 use poker::{EvalClass, Evaluator};
-use rustyline::{ColorMode, Config, Editor};
 
 mod common;
-use common::ColorPrompt;
 
 fn main() {
     let eval = Evaluator::new();
 
     println!("{}", WELCOME.bright_green().bold());
 
-    let config = Config::builder().color_mode(ColorMode::Enabled).build();
-    let mut rl = Editor::with_config(config);
-    rl.set_helper(Some(ColorPrompt));
+    let mut rl = common::editor();
 
     while let Ok(line) = rl.readline(PROMPT) {
         rl.add_history_entry(&line);

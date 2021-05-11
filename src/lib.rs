@@ -7,7 +7,7 @@
 //!
 //! ```
 //! # fn main() {
-//! #     if let Err(_) = run() { ::std::process::exit(1) }
+//! #     if run().is_err() { std::process::exit(1); }
 //! # }
 //! #
 //! # fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -29,6 +29,41 @@
 //!     }
 //! ));
 //! assert!(hand.is_royal_flush());
+//! # Ok(())
+//! # }
+//! ```
+//!
+//!
+//! The [`Evaluator`] does not expose any mutable methods, so it's perfectly
+//! safe to wrap it into an [`Arc`](std::sync::Arc) and share it between
+//! multiple threads.
+//!
+//! ```
+//! # fn main() {
+//! #     if run().is_err() { std::process::exit(1); }
+//! # }
+//! # fn run() -> Result<(), Box<dyn std::error::Error>> {
+//! use std::{cmp, sync::Arc, thread};
+//!
+//! use poker::{Card, Eval, Evaluator};
+//!
+//! let shared_evaluator = Arc::new(Evaluator::new());
+//! let mut handles = vec![];
+//! for _ in 0..10 {
+//!     let evaluator = Arc::clone(&shared_evaluator);
+//!     handles.push(thread::spawn(move || {
+//!         let deck = Card::generate_shuffled_deck();
+//!         let hand = &deck[..5];
+//!         evaluator.evaluate(hand).unwrap_or(Eval::WORST)
+//!     }));
+//! }
+//!
+//! let max = handles
+//!     .into_iter()
+//!     .map(|handle| handle.join().unwrap())
+//!     .fold(Eval::WORST, cmp::max);
+//!
+//! println!("{}", max);
 //! # Ok(())
 //! # }
 //! ```

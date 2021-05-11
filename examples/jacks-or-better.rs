@@ -4,10 +4,10 @@ use colored::Colorize;
 use itertools::Itertools;
 use poker::{Card, EvalClass, Evaluator, Rank};
 use rand::prelude::*;
-use rustyline::{ColorMode, Config, Editor};
 
+#[macro_use]
 mod common;
-use common::ColorPrompt;
+use common::Editor;
 
 const STARTING_CREDITS: usize = 100;
 const MAX_WAGER: usize = 5;
@@ -18,15 +18,13 @@ To quit, enter "quit" or press CTRL+C.
 
 fn main() {
     // Clear the screen
-    print!("\x1B[2J\x1B[1;1H");
+    clear_terminal!();
     let mut rng = thread_rng();
     let eval = Evaluator::new();
 
     println!("{}", WELCOME.bright_green().bold());
 
-    let config = Config::builder().color_mode(ColorMode::Enabled).build();
-    let mut rl = Editor::with_config(config);
-    rl.set_helper(Some(ColorPrompt));
+    let mut rl = common::editor();
 
     // Game setup
     let mut deck = Card::generate_shuffled_deck().to_vec();
@@ -42,28 +40,23 @@ fn main() {
         credits -= wager;
 
         // Deal hand and print cards, along with helper numbers
-        hand.extend(deck.drain(0..5));
+        hand.extend(deck.drain(..5));
         let first_eval = eval.evaluate(&hand).unwrap();
+        clear_terminal!();
         println!(
-            "\x1B[2J\x1B[1;1H{} {} {} {} {} ({})\n (1)    (2)    (3)    (4)    (5)",
+            "{} {} {} {} {} ({})\n (1)    (2)    (3)    (4)    (5)",
             &hand[0], &hand[1], &hand[2], &hand[3], &hand[4], first_eval
         );
 
         // Get swaps as a vector of indices in the hand the user wishes to swap
-        let swaps: Vec<usize> = match get_swaps(&mut rl) {
+        let swaps = match get_swaps(&mut rl) {
             None => break 'game,
             Some(swaps) => swaps,
         };
 
         // Replace swaps in hand
         if !swaps.is_empty() {
-            for &index in &swaps {
-                deck.push(hand[index]);
-            }
-            deck.shuffle(&mut rng);
-            for (i, dealt_card) in deck.drain(0..swaps.len()).enumerate() {
-                hand[swaps[i]] = dealt_card;
-            }
+            swap_cards(swaps, &mut deck, &mut hand, &mut rng);
         }
 
         // Print second hand
@@ -90,12 +83,12 @@ fn main() {
         println!(
             "{}",
             if winnings > 0 {
+                credits += winnings;
                 winnings_string.as_str().bright_green().bold()
             } else {
                 winnings_string.as_str().bright_red().bold()
             }
         );
-        credits += winnings;
         if credits == 0 {
             println!("{}", "Game over!".bright_red().bold());
             break 'game;
@@ -110,9 +103,19 @@ fn main() {
     }
 }
 
+fn swap_cards(swaps: Vec<usize>, deck: &mut Vec<Card>, hand: &mut Vec<Card>, rng: &mut ThreadRng) {
+    for &index in &swaps {
+        deck.push(hand[index]);
+    }
+    deck.shuffle(rng);
+    for (i, dealt_card) in deck.drain(..swaps.len()).enumerate() {
+        hand[swaps[i]] = dealt_card;
+    }
+}
+
 /// Attempt to read a wager from stdin. Returns None if the outer 'game loop
 /// needs to be broken.
-fn get_wager(rl: &mut Editor<ColorPrompt>, credits: usize) -> Option<usize> {
+fn get_wager(rl: &mut Editor, credits: usize) -> Option<usize> {
     let message = format!("Enter a wager. (Credits: {}, max: {})", credits, MAX_WAGER);
     loop {
         println!("{}", message.as_str().bright_green().bold());
@@ -159,7 +162,7 @@ fn get_wager(rl: &mut Editor<ColorPrompt>, credits: usize) -> Option<usize> {
 
 /// Attempt to read swaps from stdin. Return None if the outer 'game loop needs
 /// to be broken.
-fn get_swaps(rl: &mut Editor<ColorPrompt>) -> Option<Vec<usize>> {
+fn get_swaps(rl: &mut Editor) -> Option<Vec<usize>> {
     let message = "Enter the cards' numbers you wish to swap, if any.";
     loop {
         println!("{}", message.bright_green().bold());
@@ -189,7 +192,7 @@ fn get_swaps(rl: &mut Editor<ColorPrompt>) -> Option<Vec<usize>> {
         // Validate the indices
         let mut duplicates = HashSet::with_capacity(swaps.len());
         match swaps {
-            // All indices should be in the ranger 1..=5
+            // All indices should be in the range 1..=5
             swaps if !swaps.iter().all(|num| matches!(*num, 1..=5)) => println!(
                 "Error parsing input '{}'. Not all listed numbers are between 1 and 5.\n",
                 input,
@@ -202,7 +205,7 @@ fn get_swaps(rl: &mut Editor<ColorPrompt>) -> Option<Vec<usize>> {
             ),
 
             // No duplicate swaps
-            swaps if !swaps.iter().all(|x| duplicates.insert(*x)) => {
+            swaps if !swaps.iter().all(move |x| duplicates.insert(*x)) => {
                 let counts = swaps
                     .into_iter()
                     .counts()

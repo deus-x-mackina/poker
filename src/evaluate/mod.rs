@@ -158,7 +158,7 @@ impl Evaluator {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use std::collections::HashSet;
 
     use lazy_static::lazy_static;
@@ -170,7 +170,7 @@ mod tests {
     };
 
     lazy_static! {
-        static ref EVALUATOR: Evaluator = Evaluator::new();
+        pub static ref EVALUATOR: Evaluator = Evaluator::new();
     }
 
     #[test]
@@ -207,9 +207,7 @@ mod tests {
         assert!(T::ALL_HANDS.iter().all(|&hand| hand.len() == hand_size));
 
         let mut evaluations = T::ALL_HANDS.iter().map(|&hand| {
-            let cards = Card::parse_to_iter(hand)
-                .try_collect::<Box<_>>()
-                .unwrap();
+            let cards = Card::parse_to_iter(hand).try_collect::<Box<_>>().unwrap();
             EVALUATOR.evaluate(cards).unwrap()
         });
 

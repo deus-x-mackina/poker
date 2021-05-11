@@ -166,40 +166,5 @@ impl Hash for Meta {
 }
 
 impl fmt::Display for Meta {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::HighCard { high_rank, .. } => write!(f, "High card, {}", high_rank.as_str_name()),
-            Self::Pair { pair, .. } => write!(f, "Pair, {}", pair.as_str_name_plural()),
-            Self::TwoPair {
-                high_pair,
-                low_pair,
-                ..
-            } => write!(
-                f,
-                "Two pair, {} and {}",
-                high_pair.as_str_name_plural(),
-                low_pair.as_str_name_plural(),
-            ),
-            Self::ThreeOfAKind { trips, .. } => {
-                write!(f, "Three of a kind, {}", trips.as_str_name_plural())
-            }
-            Self::Straight { high_rank, .. } => {
-                write!(f, "Straight, {}-high", high_rank.as_str_name())
-            }
-            Self::Flush { high_rank, .. } => write!(f, "Flush, {}-high", high_rank.as_str_name()),
-            Self::FullHouse { trips, pair, .. } => write!(
-                f,
-                "Full house, {} over {}",
-                trips.as_str_name_plural(),
-                pair.as_str_name_plural()
-            ),
-            Self::FourOfAKind { quads, .. } => {
-                write!(f, "Four of a kind, {}", quads.as_str_name_plural())
-            }
-            Self::StraightFlush { high_rank, .. } => match high_rank {
-                Rank::Ace => write!(f, "Royal flush"),
-                high_rank => write!(f, "Straight flush, {}-high", high_rank.as_str_name()),
-            },
-        }
-    }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { self.class().fmt(f) }
 }

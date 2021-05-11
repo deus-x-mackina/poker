@@ -272,13 +272,11 @@ impl Card {
         cards
     }
 
-    /// From an iterator that yields strings, return a new [`Iterator`] that
-    /// yields `Result<Card, ParseCardError>`. Similar to
-    /// [`Card::parse_to_vec`], but does not allocate a vector by default. The
-    /// iterator adaoptor returned by this associated function has a special
-    /// method [`try_collect`], which is a shortcut over using
-    /// `collect::<Result<_, _>, _>()`. This was inspired by the [`itertools`]
-    /// crate.
+    /// From an [`Iterator`] that yields strings, return a new [`Iterator`] that
+    /// yields `Result<Card, ParseCardError>`. The iterator adaoptor returned by
+    /// this associated function has a special method [`try_collect`], which
+    /// is a shortcut over using `collect::<Result<_, _>, _>()`. This was
+    /// inspired by the [`itertools`] crate.
     ///
     /// # Errors
     ///
@@ -309,12 +307,12 @@ impl Card {
     ///
     /// [`try_collect`]: ParseToIter::try_collect
     /// [`itertools`]: itertools::Itertools::try_collect
-    pub fn parse_to_iter<S, T>(
+    pub fn parse_to_iter<S>(
         strings: S,
     ) -> ParseToIter<impl Iterator<Item = Result<Self, ParseCardError>>>
     where
-        S: IntoIterator<Item = T>,
-        T: AsRef<str>,
+        S: IntoIterator,
+        S::Item: AsRef<str>,
     {
         ParseToIter(strings.into_iter().map(|s| s.as_ref().parse()))
     }
@@ -358,13 +356,11 @@ impl Ord for Card {
 
 impl fmt::Debug for Card {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Card {{ unique_integer: {}, rank: {}, suit: {} }}",
-            self.unique_integer,
-            self.rank(),
-            self.suit()
-        )
+        f.debug_struct("Card")
+            .field("unique_integer", &self.unique_integer())
+            .field("rank", &self.rank())
+            .field("suit", &self.suit())
+            .finish()
     }
 }
 
@@ -416,6 +412,7 @@ where
     /// [`itertools`] crate.
     ///
     /// # Errors
+    ///
     /// If any item in this iterator yields an `Err` variant, that `Err` is
     /// returned.
     ///
@@ -502,5 +499,16 @@ mod tests {
         }
         assert!(suits.into_iter().all(|(_, count)| count == 13));
         assert!(ranks.into_iter().all(|(_, count)| count == 4));
+    }
+
+    #[test]
+    fn generate_deck_is_52_cards() {
+        assert_eq!(Card::generate_deck().count(), 52);
+    }
+
+    #[test]
+    #[cfg(feature = "rand")]
+    fn generate_shuffled_deck_is_52_cards() {
+        assert_eq!(Card::generate_shuffled_deck().len(), 52);
     }
 }

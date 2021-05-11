@@ -91,8 +91,8 @@ impl Suit {
             0b1000 => Clubs,
             0b0100 => Diamonds,
             0b0010 => Hearts,
-            // Really, this should be 0b001 => Spades, _ => unreachable!() but you can't panic
-            // in const functions in stable Rust yet.
+            // FIXME: Really, this should be 0b001 => Spades, _ => unreachable!() but you can't
+            // panic in const functions in stable Rust yet.
             _ => Spades,
         }
     }

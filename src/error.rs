@@ -1,8 +1,9 @@
 //! Two different error types that may be encountered when trying to parse
 //! [`Card`] types from strings, or when trying to evaluate hands.
 //!
-//! The [`Debug`] representations aren't *particularly* helpful, so try to
-//! display errors as [`Display`](std::fmt::Display) when possible.
+//! The [`Debug`](std::fmt::Debug) representations aren't *particularly*
+//! helpful, so try to display errors as [`Display`](std::fmt::Display) when
+//! possible.
 
 use std::{error::Error, fmt};
 
@@ -218,3 +219,72 @@ impl fmt::Display for EvalError {
 }
 
 impl Error for EvalError {}
+
+#[cfg(test)]
+mod tests {
+    use crate::{cards, Card};
+
+    #[test]
+    fn parse_card_error_format() {
+        // Invalid length
+        let e = "5".parse::<Card>().unwrap_err();
+
+        assert_eq!(
+            e.to_string(),
+            format!(
+                "Error parsing input '{}' as a Card: Found input of length {}, expected 2",
+                "5", 1
+            )
+        );
+
+        // Invalid rank
+        let e = "ac".parse::<Card>().unwrap_err();
+        assert_eq!(
+            e.to_string(),
+            format!(
+                "Error parsing input '{}' as a Card: Invalid rank character '{}', expected one of \
+                 [23456789TJQKA]",
+                "ac", 'a'
+            )
+        );
+
+        // Invalid suit
+        let e = "TC".parse::<Card>().unwrap_err();
+        assert_eq!(
+            e.to_string(),
+            format!(
+                "Error parsing input '{}' as a Card: Invalid suit character '{}', expected one of \
+                 [chsd]",
+                "TC", 'C'
+            )
+        );
+    }
+
+    #[test]
+    fn eval_error_format() {
+        use crate::evaluate::tests::EVALUATOR;
+        // Cards not unique
+        let cards = cards!("5c 5c Tc Jc Qc").try_collect::<Vec<Card>>().unwrap();
+        let e = EVALUATOR.evaluate(cards).unwrap_err();
+        assert_eq!(
+            e.to_string(),
+            format!(
+                "Cannot evaluate a poker hand with a set of cards that are not unique. Cards \
+                 duplicated at least once: {}",
+                "5c"
+            )
+        );
+
+        // Invalid hand size
+        let cards = &cards!(Ace of Spades);
+        let e = EVALUATOR.evaluate(cards).unwrap_err();
+        assert_eq!(
+            e.to_string(),
+            format!(
+                "Cannot evaluate a poker hand with a set of less than 5 cards. Number of cards \
+                 received: {}",
+                1
+            )
+        )
+    }
+}

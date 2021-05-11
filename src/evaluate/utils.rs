@@ -29,8 +29,8 @@ impl BitSequence {
     pub fn get_next(&mut self) -> i16 {
         self.t = self.bits | self.bits.wrapping_sub(1);
         self.next_bits = self.t.wrapping_add(1);
-        self.next_bits |=
-            ((!self.t & (!self.t).wrapping_neg()).wrapping_sub(1)) >> self.bits.trailing_zeros().wrapping_add(1);
+        self.next_bits |= ((!self.t & (!self.t).wrapping_neg()).wrapping_sub(1))
+            >> self.bits.trailing_zeros().wrapping_add(1);
         self.bits = self.next_bits;
         self.next_bits
     }
