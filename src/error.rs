@@ -98,15 +98,15 @@ pub enum ParseCardError {
 
 impl fmt::Display for ParseCardError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::InvalidLength { original_input } => write!(
+        match *self {
+            Self::InvalidLength { ref original_input } => write!(
                 f,
                 "Error parsing input '{}' as a Card: Found input of length {}, expected 2",
                 original_input,
                 original_input.len()
             ),
             Self::InvalidRank {
-                original_input,
+                ref original_input,
                 incorrect_char,
             } => write!(
                 f,
@@ -115,7 +115,7 @@ impl fmt::Display for ParseCardError {
                 original_input, incorrect_char
             ),
             Self::InvalidSuit {
-                original_input,
+                ref original_input,
                 incorrect_char,
             } => write!(
                 f,
@@ -185,8 +185,8 @@ pub enum EvalError {
 
 impl fmt::Display for EvalError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::CardsNotUnique(cards) => {
+        match *self {
+            Self::CardsNotUnique(ref cards) => {
                 let dups: String = cards
                     .iter()
                     .counts()
