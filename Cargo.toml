@@ -10,7 +10,6 @@ description = "A crate for speedy poker hand evaluation"
 keywords = ["poker", "card", "game", "evaluate", "holdem"]
 categories = ["algorithms", "data-structures", "games", "game-development"]
 readme = "README.md"
-resolver = "2"
 
 [dependencies]
 # Some iterative algorithms
