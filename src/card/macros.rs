@@ -40,7 +40,7 @@ macro_rules! card {
         $crate::Card::new($crate::Rank::$rank, $crate::Suit::$suit)
     };
     ($rank:ident of $suit:ident) => {
-        $crate::card!($rank, $suit);
+        $crate::card!($rank, $suit)
     };
     ($card_string:expr) => {
         $card_string.parse::<$crate::card::Card>()
@@ -145,7 +145,7 @@ macro_rules! cards {
         [$($crate::card!($rank, $suit)),+]
     };
     ($($rank:ident of $suit:ident),+ $(,)?) => {
-        $crate::cards!($($rank, $suit);+);
+        $crate::cards!($($rank, $suit);+)
     };
     ($card_string:expr, $($card_strings:expr),+ $(,)?) => {
         $crate::Card::parse_to_iter(&[$card_string, $($card_strings),+])
