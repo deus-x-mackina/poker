@@ -45,7 +45,7 @@ doc-comment = "0.3"
 # Examples
 rustyline = "9"
 colored = "2"
-rustyline-derive = "0.5"
+rustyline-derive = "0.6"
 # Benching
 criterion = { version = "0.3", features = ["html_reports"] }
 
