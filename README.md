@@ -36,7 +36,7 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.3"
+poker = "0.4"
 ```
 
 ## Features
@@ -55,7 +55,7 @@ for possible `no_std` support in the future. To enable this feature:
 ```toml
 [dependencies]
 # To use without `rand`, add `default-features = false`
-poker = { version = "0.3", features = ["static_lookup"] }
+poker = { version = "0.4", features = ["static_lookup"] }
 ```
 
 ## A Note on Performance
