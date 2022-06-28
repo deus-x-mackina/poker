@@ -4,10 +4,10 @@
 [![Docs.rs](https://docs.rs/poker/badge.svg)](https://docs.rs/poker)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
-`poker` is a Rust crate for the speedy evaluation of poker hands. It it based on
-the [`treys`](https://github.com/ihendley/treys) Python package and the
-algorithms found within, with mild adaptations and some personal touches to try
-to make it as idiomatic as possible in Rust.
+`poker` is a Rust crate for the speedy evaluation and comparison of poker hands.
+It it based on the [`treys`](https://github.com/ihendley/treys) Python package
+and the algorithms found within, with mild adaptations and some personal touches
+to try to make it as idiomatic as possible in Rust.
 
 ```rust
 use poker::{Evaluator, cards, Card};
