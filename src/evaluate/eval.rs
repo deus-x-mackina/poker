@@ -1,8 +1,9 @@
 use std::fmt;
 
-#[cfg(test)]
-use super::hand_rank::PokerHandRank;
-use crate::{evaluate::meta::Meta, EvalClass};
+use crate::{
+    evaluate::{hand_rank::PokerHandRank, meta::Meta},
+    EvalClass,
+};
 
 /// The result of a successful poker hand evaluation. When printed in
 /// [`Display`] format, shows the proper, qualified name of the poker hand.
@@ -30,12 +31,31 @@ impl Eval {
     /// The worst possible poker hand, a seven-high.
     pub const WORST: Self = Self(Meta::WORST);
 
-    #[cfg(test)]
     pub(crate) const fn hand_rank(self) -> PokerHandRank { self.0.hand_rank() }
 
     /// The class of poker hand that was evaluated. Useful for pattern matching
     /// as opposed to checking with an `is_x()` method.
     pub const fn class(self) -> EvalClass { self.0.class() }
+
+    /// Compare this hand evaluation to another, returning `true` if this hand
+    /// definitively beats the other, and `false` otherwise. This is equivalent
+    /// to the operation `self > other`, but is a `const fn`.
+    pub const fn is_better_than(self, other: Self) -> bool {
+        self.hand_rank().is_better_than(other.hand_rank())
+    }
+
+    /// Compare this hand evaluation to another, returning `true` if this hand
+    /// is definitively beaten by the other, and `false` otherwise. This is
+    /// equivalent to the operation `self < other`, but is a `const fn`.
+    pub const fn is_worse_than(self, other: Self) -> bool { !self.is_better_than(other) }
+
+    /// Compare this hand evaluation to another, returning `true` if this hand
+    /// is utterly equivalent to the other **in terms of its ranking in poker**,
+    /// and `false` otherwise. This is equivalent to the operation `self ==
+    /// other`, but is a `const fn`.
+    pub const fn is_equal_to(self, other: Self) -> bool {
+        self.hand_rank().0 == other.hand_rank().0
+    }
 
     /// Check whether this hand is a high-card.
     pub const fn is_high_card(self) -> bool { self.0.is_high_card() }
