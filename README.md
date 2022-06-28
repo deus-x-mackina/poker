@@ -4,10 +4,10 @@
 [![Docs.rs](https://docs.rs/poker/badge.svg)](https://docs.rs/poker)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
-`poker` is a Rust crate for the speedy evaluation of poker hands. It it based on
-the [`treys`](https://github.com/ihendley/treys)
-Python package and the algorithms found within, with mild adaptations and some
-personal touches to try to make it as idiomatic as possible in Rust.
+`poker` is a Rust crate for the speedy evaluation and comparison of poker hands.
+It it based on the [`treys`](https://github.com/ihendley/treys) Python package
+and the algorithms found within, with mild adaptations and some personal touches
+to try to make it as idiomatic as possible in Rust.
 
 ```rust
 use poker::{Evaluator, cards, Card};
@@ -41,16 +41,18 @@ poker = "0.3"
 
 ## Features
 
-`poker` currently has two features. One depends on the [`rand`](https://crates.io/crates/rand) crate,
-in order to shuffle generated decks. This is enabled by default.
+`poker` currently has two features. One depends on the
+[`rand`](https://crates.io/crates/rand) crate, in order to shuffle generated
+decks. This is enabled by default.
 
-The second feature, which is also not enabled by default is `static_lookup`. Enabling
-this feature opens up the `poker::evaluate::static_lookup` module, which contains
-the free `evauluate` function. It works similar to `Evaluator::evaluate`, but
-semantically it uses a static data structure that does not rely on heap allocations.
+The second feature, which is also not enabled by default is `static_lookup`.
+Enabling this feature opens up the `poker::evaluate::static_lookup` module,
+which contains the free `evauluate` function. It works similar to
+`Evaluator::evaluate`, but semantically it uses a static data structure that
+does not rely on heap allocations.
 
-There is no real benefit to using the feature yet, but it is an experimental first step
-for possible `no_std` support in the future. To enable this feature:
+There is no real benefit to using the feature yet, but it is an experimental
+first step for possible `no_std` support in the future. To enable this feature:
 
 ```toml
 [dependencies]
@@ -76,16 +78,19 @@ lto = true # the default is false!
 
 `poker` includes two fun builtin examples: `poker-repl` and `jacks-or-better`.
 `poker-repl` is a `repl`-like environment when you can evaluate different poker
-hands. `jacks-or-better` is a terminal re-creation of the Jacks or Better
-video poker game. Payouts based on [this image](https://www.gamblingsites.com/wp-content/uploads/2016/08/video-poker-pay-table-jacks-or-better.png).
-Rules for the game can be found [here](https://www.onlinepoker.net/games/jacks-or-better).
+hands. `jacks-or-better` is a terminal re-creation of the Jacks or Better video
+poker game. Payouts based on
+[this image](https://www.gamblingsites.com/wp-content/uploads/2016/08/video-poker-pay-table-jacks-or-better.png).
+Rules for the game can be found
+[here](https://www.onlinepoker.net/games/jacks-or-better).
 
 > ### DISCLAIMER
 >
 > The `jacks-or-better` example from the `poker` crate has themes of gambling
 > using a currency called `credits`. This program is meant for example purposes
-> only to illustrate one possible use of this library. There is no risk associated
-> with running the example as it can be terminated and restarted at any time.
+> only to illustrate one possible use of this library. There is no risk
+> associated with running the example as it can be terminated and restarted at
+> any time.
 >
 > Please be aware of the possible financial risk of real gambling.
 
@@ -110,4 +115,5 @@ cargo run --example=jacks-or-better
 
 ## License
 
-Licensed under the MIT license ([LICENSE.txt](LICENSE.txt) or <http://opensource.org/licenses/MIT>).
+Licensed under the MIT license ([LICENSE.txt](LICENSE.txt) or
+<http://opensource.org/licenses/MIT>).

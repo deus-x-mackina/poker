@@ -21,6 +21,39 @@ use crate::{
 /// assert!(result.is_pair());
 /// ```
 ///
+/// Instances of `Eval` can be compared against one another in order to
+/// determine which hand evaluations are better, worse, or equivalent. This can
+/// be accomplished through the [`is_better_than`](Eval::is_better_than),
+/// [`is_worse_than`](Eval::is_worse_than), and
+/// [`is_equal_to`](Eval::is_equal_to) methods. `Eval` also implements [`Ord`]
+/// and [`Eq`], so you may also use the operators `>`, `<`, and `==`
+/// respectively. Card hand comparisons are robust are take into account kicker
+/// cards, so hands with equivalent classes (i.e., two Jack-high flushes) can
+/// still be compared.
+///
+/// ```
+/// # fn main() {
+/// #     if run().is_err() { std::process::exit(1); }
+/// # }
+/// #
+/// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// use poker::{card::Rank, cards, Card, EvalClass, Evaluator};
+/// let eval = Evaluator::new();
+/// let better_flush_cards: Vec<Card> = cards!("Jh Th 7h 4h 3h").try_collect()?;
+/// let worse_flush_cards: Vec<Card> = cards!("Jc Tc 7c 4c 2c").try_collect()?;
+///
+/// let better_flush_hand = eval.evaluate(better_flush_cards)?;
+/// let worse_flush_hand = eval.evaluate(worse_flush_cards)?;
+///
+/// let jack_high_flush = EvalClass::Flush {
+///     high_rank: Rank::Jack,
+/// };
+/// assert_eq!(better_flush_hand.class(), jack_high_flush);
+/// assert_eq!(worse_flush_hand.class(), jack_high_flush);
+/// assert!(better_flush_hand.is_better_than(worse_flush_hand));
+/// # Ok(())
+/// # }
+/// ```
 /// [`Display`]: std::fmt::Display
 #[derive(Debug, Copy, Clone, PartialOrd, Ord, PartialEq, Eq, Hash)]
 pub struct Eval(pub(crate) Meta);

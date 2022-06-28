@@ -17,18 +17,23 @@
 //! let eval = Evaluator::new();
 //!
 //! // Parse a `Vec` of cards from a str
-//! let cards: Vec<Card> = cards!("Ks Js Ts Qs As").try_collect()?;
+//! let royal_flush_cards: Vec<Card> = cards!("Ks Js Ts Qs As").try_collect()?;
 //!
 //! // Evaluate the hand
-//! let hand = eval.evaluate(cards)?;
+//! let royal_flush_hand = eval.evaluate(royal_flush_cards)?;
 //!
 //! assert!(matches!(
-//!     hand.class(),
+//!     royal_flush_hand.class(),
 //!     EvalClass::StraightFlush {
 //!         high_rank: Rank::Ace
 //!     }
 //! ));
-//! assert!(hand.is_royal_flush());
+//! assert!(royal_flush_hand.is_royal_flush());
+//!
+//! // Compare hands
+//! let pair_cards: Vec<Card> = cards!("3c 4h Td 3h Kd").try_collect()?;
+//! let pair_hand = eval.evaluate(pair_cards)?;
+//! assert!(royal_flush_hand.is_better_than(pair_hand));
 //! # Ok(())
 //! # }
 //! ```
