@@ -30,8 +30,8 @@ mod macros;
 mod class;
 mod eval;
 mod hand_rank;
-// This needs to be public to bootstrap a lookup table in a build script, rather than
-// shipping the `table.in` file, which is large and unnecessary
+// This needs to be public to bootstrap a lookup table in a build script, rather
+// than shipping the `table.in` file, which is large and unnecessary
 #[doc(hidden)]
 pub mod lookup_table;
 mod meta;

@@ -154,7 +154,7 @@ mod tests {
         macro_rules! fail {
             () => {
                 "The dynamic and static lookup tables contain different data. This is a bug! The \
-     static table may need to be regenerated."
+                 static table may need to be regenerated."
             };
         }
 
