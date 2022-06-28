@@ -1,6 +1,6 @@
 [package]
 name = "poker"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Daniel Mack"]
 edition = "2021"
 repository = "https://github.com/deus-x-mackina/poker"

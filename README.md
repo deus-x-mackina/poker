@@ -36,7 +36,7 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.3"
+poker = "0.4"
 ```
 
 ## Features
@@ -57,7 +57,7 @@ first step for possible `no_std` support in the future. To enable this feature:
 ```toml
 [dependencies]
 # To use without `rand`, add `default-features = false`
-poker = { version = "0.3", features = ["static_lookup"] }
+poker = { version = "0.4", features = ["static_lookup"] }
 ```
 
 ## A Note on Performance
@@ -92,7 +92,7 @@ Rules for the game can be found
 > associated with running the example as it can be terminated and restarted at
 > any time.
 >
-> Please be aware of the possible financial risk of real gambling.
+> Please be aware of the financial risk of real gambling.
 
 You can install these examples through `cargo` by running the following command:
 
