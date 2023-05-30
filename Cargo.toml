@@ -12,6 +12,9 @@ keywords = ["poker", "card", "game", "evaluate", "holdem"]
 categories = ["algorithms", "data-structures", "games", "game-development"]
 readme = "README.md"
 
+[lib]
+bench = false
+
 [dependencies]
 # Some iterative algorithms
 itertools = "0.10"
@@ -48,7 +51,7 @@ rustyline = "11"
 colored = "2"
 rustyline-derive = "0.8"
 # Benching
-criterion = { version = "0.3", features = ["html_reports"] }
+criterion = { version = "0.5", features = ["html_reports"] }
 
 [[bench]]
 name = "evaluation"
