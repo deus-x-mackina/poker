@@ -3,7 +3,9 @@
 use std::borrow::Cow;
 
 use colored::Colorize;
-use rustyline::{highlight::Highlighter, ColorMode, Config, Editor as RlEditor};
+use rustyline::{
+    highlight::Highlighter, history::MemHistory, ColorMode, Config, Editor as RlEditor,
+};
 use rustyline_derive::{Completer, Helper, Hinter, Validator};
 
 #[derive(Completer, Helper, Hinter, Validator)]
@@ -25,12 +27,12 @@ impl Highlighter for ColorPrompt {
 
 pub fn editor() -> Editor {
     let config = Config::builder().color_mode(ColorMode::Enabled).build();
-    let mut rl = Editor::with_config(config);
+    let mut rl = Editor::with_history(config, MemHistory::new()).unwrap();
     rl.set_helper(Some(ColorPrompt));
     rl
 }
 
-pub type Editor = RlEditor<ColorPrompt>;
+pub type Editor = RlEditor<ColorPrompt, MemHistory>;
 
 #[allow(unused)]
 macro_rules! clear_terminal {

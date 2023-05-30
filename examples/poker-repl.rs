@@ -11,7 +11,7 @@ fn main() {
     let mut rl = common::editor();
 
     while let Ok(line) = rl.readline(PROMPT) {
-        rl.add_history_entry(&line);
+        rl.add_history_entry(&line).unwrap();
         match line.as_str() {
             "help" => println!("{}", HELP.bright_green().bold()),
             "quit" => break,
