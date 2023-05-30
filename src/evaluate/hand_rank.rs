@@ -13,4 +13,6 @@ impl PokerHandRank {
 
     /// Use this rather than Ord, because < meaning better can be confusing.
     pub const fn is_better_than(self, other: Self) -> bool { self.0 < other.0 }
+
+    pub const fn is_worse_than(self, other: Self) -> bool { self.0 > other.0 }
 }

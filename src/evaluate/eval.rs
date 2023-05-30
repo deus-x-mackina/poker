@@ -80,7 +80,9 @@ impl Eval {
     /// Compare this hand evaluation to another, returning `true` if this hand
     /// is definitively beaten by the other, and `false` otherwise. This is
     /// equivalent to the operation `self < other`, but is a `const fn`.
-    pub const fn is_worse_than(self, other: Self) -> bool { !self.is_better_than(other) }
+    pub const fn is_worse_than(self, other: Self) -> bool {
+        self.hand_rank().is_worse_than(other.hand_rank())
+    }
 
     /// Compare this hand evaluation to another, returning `true` if this hand
     /// is utterly equivalent to the other **in terms of its ranking in poker**,
@@ -128,6 +130,7 @@ impl fmt::Display for Eval {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{cards, evaluate::tests::EVALUATOR};
 
     #[test]
     fn eval_best() {
@@ -142,5 +145,38 @@ mod tests {
         let result = Eval::WORST;
         assert!(result.is_high_card());
         assert_eq!(result.to_string(), "High card, seven");
+    }
+
+    #[test]
+    fn eval_better_worse_tie() {
+        // Pair of twos
+        let hand: Vec<_> = cards!["2h", "2c", "5h", "Qd", "6s"].try_collect().unwrap();
+        let hand = EVALUATOR.evaluate(hand).unwrap();
+
+        // Pair of threes
+        let better: Vec<_> = cards!["3h", "3d", "5c", "Qs", "6h"].try_collect().unwrap();
+        let better = EVALUATOR.evaluate(better).unwrap();
+
+        // Ace high
+        let worse: Vec<_> = cards!["Ac", "Kd", "Jd", "7h", "5d"].try_collect().unwrap();
+        let worse = EVALUATOR.evaluate(worse).unwrap();
+
+        let tie: Vec<_> = cards!["2s", "2d", "5s", "Qc", "6d"].try_collect().unwrap();
+        let tie = EVALUATOR.evaluate(tie).unwrap();
+
+        // `is_better_than`
+        assert!(!hand.is_better_than(better));
+        assert!(hand.is_better_than(worse));
+        assert!(!hand.is_better_than(tie));
+
+        // `is_worse_than`
+        assert!(hand.is_worse_than(better));
+        assert!(!hand.is_worse_than(worse));
+        assert!(!hand.is_worse_than(tie));
+
+        // `is_equal_to`
+        assert!(!hand.is_equal_to(better));
+        assert!(!hand.is_equal_to(worse));
+        assert!(hand.is_equal_to(tie));
     }
 }
