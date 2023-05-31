@@ -1,3 +1,5 @@
+use std::array;
+
 use itertools::Itertools;
 use variter::VarIter;
 
@@ -7,10 +9,56 @@ use crate::{
     evaluate::lookup_table,
 };
 
+#[derive(Debug, Clone, Copy)]
+struct Combinations<'a, T, const N: usize> {
+    data: &'a [T],
+    indices: [usize; N],
+    done: bool,
+}
+
+impl<'a, T, const N: usize> Combinations<'a, T, N> {
+    fn new(data: &'a [T]) -> Self {
+        let indices = array::from_fn(|index| index);
+        Self {
+            data,
+            indices,
+            done: false,
+        }
+    }
+}
+
+impl<'a, T: Copy, const N: usize> Iterator for Combinations<'a, T, N> {
+    type Item = [T; N];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
+        let result = self.indices.map(|i| self.data[i]);
+
+        for i in (0..N).rev() {
+            if i == 0 && self.indices[i] == self.data.len() - N + i {
+                self.done = true;
+            }
+
+            if self.indices[i] < self.data.len() - N + i {
+                self.indices[i] += 1;
+                for j in i + 1..N {
+                    self.indices[j] = self.indices[j - 1] + 1;
+                }
+                break;
+            }
+        }
+
+        Some(result)
+    }
+}
+
 /// Originally from <http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation>.
 /// This differs from the implementation in Python because we use trailing
 /// zeroes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct BitSequence {
     bits: i16,
     t: i16,
@@ -36,13 +84,11 @@ impl BitSequence {
     }
 }
 
-/// Return the combinations of size `r` from the iterable's items.
-pub fn combinations_generator<I>(iterable: I, r: usize) -> impl Iterator<Item = Vec<I::Item>>
+pub fn const_combos<T, const N: usize>(items: &[T]) -> impl Iterator<Item = [T; N]> + '_
 where
-    I: IntoIterator,
-    I::Item: Clone,
+    T: Copy,
 {
-    iterable.into_iter().combinations(r)
+    Combinations::new(items)
 }
 
 /// Calculate a hand's prime product by using it's bit rank representation.
@@ -88,7 +134,11 @@ pub fn all_unique(hand: &[Card]) -> bool {
         .map(Card::unique_integer)
         .sorted_unstable();
 
-    let Some(mut first) = iter.next() else { return true };
+    let mut first = match iter.next() {
+        Some(first) => first,
+        None => return true,
+    };
+
     for next in iter {
         if first == next {
             return false;
@@ -102,16 +152,6 @@ pub fn all_unique(hand: &[Card]) -> bool {
 mod tests {
     use super::*;
     use crate::cards;
-
-    #[test]
-    fn combinations_generator_works() {
-        let combos = combinations_generator(vec!['c', 'a', 't'], 2).collect::<Vec<_>>();
-        let expected_combos: [[char; 2]; 3] = [['c', 'a'], ['c', 't'], ['a', 't']];
-        assert_eq!(combos.len(), expected_combos.len());
-        for &combo in &expected_combos {
-            assert!(combos.contains(&combo.into()));
-        }
-    }
 
     #[test]
     fn bit_sequence_generator_works() {
@@ -140,5 +180,16 @@ mod tests {
         assert!(!all_unique(&cards));
         let cards: Vec<_> = cards!["5c", "Th", "3d", "Th"].try_collect().unwrap();
         assert!(!all_unique(&cards));
+    }
+
+    #[test]
+    fn const_combos_works() {
+        let combos = Combinations::<'_, _, 2>::new(&vec!['c', 'a', 't']).collect::<Vec<_>>();
+        dbg!(&combos);
+        let expected_combos: [[char; 2]; 3] = [['c', 'a'], ['c', 't'], ['a', 't']];
+        assert_eq!(combos.len(), expected_combos.len());
+        for &combo in &expected_combos {
+            assert!(combos.contains(&combo.into()));
+        }
     }
 }

@@ -167,7 +167,8 @@ pub(crate) mod tests {
 
     #[test]
     fn test_all_five_card_combos() {
-        let gen = utils::combinations_generator(Card::generate_deck(), 5);
+        let deck = Card::generate_deck().collect::<Vec<_>>();
+        let gen = utils::const_combos::<_, 5>(&deck);
         let evals = gen.fold(HashSet::with_capacity(7462), |mut ints, hand| {
             ints.insert(EVALUATOR.evaluate(&hand).unwrap());
             ints

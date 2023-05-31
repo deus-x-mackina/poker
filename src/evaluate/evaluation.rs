@@ -54,10 +54,9 @@ fn five(evaluator: &impl EvaluatorTrait, cards: [Card; 5]) -> Eval {
 fn six_plus(evaluator: &impl EvaluatorTrait, cards: &[Card]) -> Eval {
     debug_assert!(cards.len() > 5);
     let mut current_max = Eval::WORST;
-    let all_five_card_combos = utils::combinations_generator(cards.iter().copied(), 5);
+    let all_five_card_combos = utils::const_combos::<_, 5>(cards);
     for combo in all_five_card_combos {
-        let cards = [combo[0], combo[1], combo[2], combo[3], combo[4]];
-        let score = five(evaluator, cards);
+        let score = five(evaluator, combo);
         if score > current_max {
             current_max = score;
         }
