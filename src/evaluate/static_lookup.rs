@@ -12,7 +12,21 @@
 //!
 //! [`Evaluator`]: crate::Evaluator
 
+use super::{
+    evaluation::{self, EvaluatorTrait},
+    meta::Meta,
+};
 use crate::{Card, Eval, EvalError};
+
+struct StaticEvaluator;
+
+impl EvaluatorTrait for StaticEvaluator {
+    type Lookup = phf::Map<i32, Meta>;
+
+    fn flush_lookup(&self) -> &Self::Lookup { statics::FLUSH_LOOKUP }
+
+    fn unsuited_lookup(&self) -> &Self::Lookup { statics::UNSUITED_LOOKUP }
+}
 
 mod statics {
     include!("../../table.in");
@@ -75,23 +89,14 @@ mod statics {
 /// ```
 pub fn evaluate<C: AsRef<[Card]>>(cards: C) -> Result<Eval, EvalError> {
     let cards = cards.as_ref();
-    evaluation_impl!(@main, cards, five(cards), six_plus(cards))
+    evaluation::evaluate(&StaticEvaluator, cards)
 }
-
-fn five(cards: &[Card]) -> Eval {
-    evaluation_impl!(@five, cards, statics::FLUSH_LOOKUP, statics::UNSUITED_LOOKUP)
-}
-
-fn six_plus(cards: &[Card]) -> Eval { evaluation_impl!(@six_plus, cards, |combo| five(combo)) }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
 
-    use super::{
-        evaluate,
-        statics::{FLUSH_LOOKUP, UNSUITED_LOOKUP},
-    };
+    use super::evaluate;
     use crate::{
         card::Card,
         evaluate::{

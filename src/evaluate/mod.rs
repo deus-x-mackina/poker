@@ -25,7 +25,7 @@
 //! [the `card` module`]: crate::card
 
 #[macro_use]
-mod macros;
+mod evaluation;
 
 mod class;
 mod eval;
@@ -145,18 +145,7 @@ impl Evaluator {
     /// ```
     pub fn evaluate<C: AsRef<[Card]>>(&self, cards: C) -> Result<Eval, EvalError> {
         let cards = cards.as_ref();
-        evaluation_impl!(@main, cards, self.five(cards), self.six_plus(cards))
-    }
-
-    /// Evaluate five cards only
-    fn five(&self, cards: &[Card]) -> Eval {
-        evaluation_impl!(@five, cards, self.0.flush_lookup, self.0.unsuited_lookup)
-    }
-
-    /// Evaluate six or more cards by running combinations of five cards and
-    /// keeping the best result.
-    fn six_plus(&self, cards: &[Card]) -> Eval {
-        evaluation_impl!(@six_plus, cards, |combo| self.five(combo))
+        evaluation::evaluate(self, cards)
     }
 }
 

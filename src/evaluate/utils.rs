@@ -1,5 +1,3 @@
-
-
 use itertools::Itertools;
 use variter::VarIter;
 
@@ -62,13 +60,10 @@ pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
 
 /// Calculate a hand's prime product if an entire `Card` representation is
 /// available.
-pub fn prime_product_from_hand(hand: &[Card]) -> i32 {
-    let mut product: i32 = 1;
-    for &card in hand {
-        // Multiply in the first 8 bits corresponding to the card's prime number
-        product = product.wrapping_mul(card.unique_integer() & 0xFF);
-    }
-    product
+pub fn prime_product_from_hand(hand: [Card; 5]) -> i32 {
+    hand.into_iter()
+        .map(|card| card.unique_integer() & 0xFF)
+        .fold(1, |acc, x| acc.wrapping_mul(x))
 }
 
 /// Obtain the high card from a given set of rank bits bit-ORed together.
@@ -87,7 +82,11 @@ pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
 
 /// Verify that all cards in a slice are unique.
 pub fn all_unique(hand: &[Card]) -> bool {
-    let mut iter = hand.iter().copied().map(Card::unique_integer).sorted_unstable();
+    let mut iter = hand
+        .iter()
+        .copied()
+        .map(Card::unique_integer)
+        .sorted_unstable();
 
     let Some(mut first) = iter.next() else { return true };
     for next in iter {
