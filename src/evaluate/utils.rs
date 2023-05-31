@@ -134,7 +134,11 @@ pub fn all_unique(hand: &[Card]) -> bool {
         .map(Card::unique_integer)
         .sorted_unstable();
 
-    let Some(mut first) = iter.next() else { return true };
+    let mut first = match iter.next() {
+        Some(first) => first,
+        None => return true,
+    };
+
     for next in iter {
         if first == next {
             return false;
