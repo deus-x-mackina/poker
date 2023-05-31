@@ -239,9 +239,12 @@ impl LookupTable {
         // One 3x rank and two unique kickers
         rank = WORST_STRAIGHT.wrapping_add(1);
         for trips in backwards_ranks.clone() {
-            let kickers = backwards_ranks.clone().filter(|&kicker| kicker != trips);
+            let kickers = backwards_ranks
+                .clone()
+                .filter(|&kicker| kicker != trips)
+                .collect::<Vec<_>>();
             // We want every combination of two kickers
-            let gen = utils::combinations_generator(kickers, 2);
+            let gen = utils::const_combos::<_, 2>(&kickers);
             for k in gen {
                 // Pull our kickers from the generator
                 let c1 = k[0] as usize;
@@ -270,12 +273,9 @@ impl LookupTable {
 
         // We want want every combination of two card ranks together to consider as our
         // two pair ranks
-        let two_pairs_combos = utils::combinations_generator(backwards_ranks.clone(), 2);
-        for two_pair in two_pairs_combos {
-            // Pull our two pairs
-            let pair1 = two_pair[0];
-            let pair2 = two_pair[1];
-
+        let bw = backwards_ranks.clone().collect::<Vec<_>>();
+        let two_pairs_combos = utils::const_combos::<_, 2>(&bw);
+        for [pair1, pair2] in two_pairs_combos {
             // Our kickers are any rank that isn't equal to one of our two pair ranks
             let kickers = backwards_ranks
                 .clone()
@@ -304,11 +304,12 @@ impl LookupTable {
         for pair_rank in backwards_ranks.clone() {
             let kickers = backwards_ranks
                 .clone()
-                .filter(|&kicker| kicker != pair_rank);
+                .filter(|&kicker| kicker != pair_rank)
+                .collect::<Vec<_>>();
 
             // We want every combination of three unique ranks that aren't equal to our pair
             // rank
-            let kicker_combos = utils::combinations_generator(kickers, 3);
+            let kicker_combos = utils::const_combos::<_, 3>(&kickers);
             for kicker_combo in kicker_combos {
                 let k1 = kicker_combo[0] as usize;
                 let k2 = kicker_combo[1] as usize;
