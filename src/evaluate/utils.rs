@@ -58,7 +58,7 @@ impl<'a, T: Copy, const N: usize> Iterator for Combinations<'a, T, N> {
 /// Originally from <http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation>.
 /// This differs from the implementation in Python because we use trailing
 /// zeroes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct BitSequence {
     bits: i16,
     t: i16,
@@ -91,6 +91,13 @@ where
     I::Item: Clone,
 {
     iterable.into_iter().combinations(r)
+}
+
+pub fn const_combos<T, const N: usize>(items: &[T]) -> impl Iterator<Item = [T; N]> + '_
+where
+    T: Copy,
+{
+    Combinations::new(items)
 }
 
 /// Calculate a hand's prime product by using it's bit rank representation.
