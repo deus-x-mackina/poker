@@ -1,3 +1,5 @@
+use std::array;
+
 use itertools::Itertools;
 use variter::VarIter;
 
@@ -6,6 +8,52 @@ use crate::{
     constants::{INT_RANKS, PRIMES},
     evaluate::lookup_table,
 };
+
+#[derive(Debug, Clone, Copy)]
+struct Combinations<'a, T, const N: usize> {
+    data: &'a [T],
+    indices: [usize; N],
+    done: bool,
+}
+
+impl<'a, T, const N: usize> Combinations<'a, T, N> {
+    fn new(data: &'a [T]) -> Self {
+        let indices = array::from_fn(|index| index);
+        Self {
+            data,
+            indices,
+            done: false,
+        }
+    }
+}
+
+impl<'a, T: Copy, const N: usize> Iterator for Combinations<'a, T, N> {
+    type Item = [T; N];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
+        }
+
+        let result = self.indices.map(|i| self.data[i]);
+
+        for i in (0..N).rev() {
+            if i == 0 && self.indices[i] == self.data.len() - N + i {
+                self.done = true;
+            }
+
+            if self.indices[i] < self.data.len() - N + i {
+                self.indices[i] += 1;
+                for j in i + 1..N {
+                    self.indices[j] = self.indices[j - 1] + 1;
+                }
+                break;
+            }
+        }
+
+        Some(result)
+    }
+}
 
 /// Originally from <http://www-graphics.stanford.edu/~seander/bithacks.html#NextBitPermutation>.
 /// This differs from the implementation in Python because we use trailing
@@ -140,5 +188,16 @@ mod tests {
         assert!(!all_unique(&cards));
         let cards: Vec<_> = cards!["5c", "Th", "3d", "Th"].try_collect().unwrap();
         assert!(!all_unique(&cards));
+    }
+
+    #[test]
+    fn const_combos_works() {
+        let combos = Combinations::<'_, _, 2>::new(&vec!['c', 'a', 't']).collect::<Vec<_>>();
+        dbg!(&combos);
+        let expected_combos: [[char; 2]; 3] = [['c', 'a'], ['c', 't'], ['a', 't']];
+        assert_eq!(combos.len(), expected_combos.len());
+        for &combo in &expected_combos {
+            assert!(combos.contains(&combo.into()));
+        }
     }
 }
