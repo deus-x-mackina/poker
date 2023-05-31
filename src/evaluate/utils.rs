@@ -84,15 +84,6 @@ impl BitSequence {
     }
 }
 
-/// Return the combinations of size `r` from the iterable's items.
-pub fn combinations_generator<I>(iterable: I, r: usize) -> impl Iterator<Item = Vec<I::Item>>
-where
-    I: IntoIterator,
-    I::Item: Clone,
-{
-    iterable.into_iter().combinations(r)
-}
-
 pub fn const_combos<T, const N: usize>(items: &[T]) -> impl Iterator<Item = [T; N]> + '_
 where
     T: Copy,
@@ -157,16 +148,6 @@ pub fn all_unique(hand: &[Card]) -> bool {
 mod tests {
     use super::*;
     use crate::cards;
-
-    #[test]
-    fn combinations_generator_works() {
-        let combos = combinations_generator(vec!['c', 'a', 't'], 2).collect::<Vec<_>>();
-        let expected_combos: [[char; 2]; 3] = [['c', 'a'], ['c', 't'], ['a', 't']];
-        assert_eq!(combos.len(), expected_combos.len());
-        for &combo in &expected_combos {
-            assert!(combos.contains(&combo.into()));
-        }
-    }
 
     #[test]
     fn bit_sequence_generator_works() {
