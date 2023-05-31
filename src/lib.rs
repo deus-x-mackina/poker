@@ -85,7 +85,6 @@ pub mod card;
 mod constants;
 pub mod error;
 pub mod evaluate;
-mod ext;
 
 #[doc(inline)]
 pub use card::{Card, Rank, Suit};

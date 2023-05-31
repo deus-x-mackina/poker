@@ -1,7 +1,7 @@
 macro_rules! evaluation_impl {
     (@main, $cards:expr, $five:expr, $six:expr) => {{
         use $crate::error::EvalError;
-        if $cards.all_unique() {
+        if $crate::evaluate::utils::all_unique($cards) {
             match $cards.len() {
                 x if x < 5 => Err(EvalError::InvalidHandSize(x)),
                 5 => Ok($five),

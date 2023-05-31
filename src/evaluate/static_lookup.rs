@@ -12,7 +12,7 @@
 //!
 //! [`Evaluator`]: crate::Evaluator
 
-use crate::{ext::AllUnique, Card, Eval, EvalError};
+use crate::{Card, Eval, EvalError};
 
 mod statics {
     include!("../../table.in");

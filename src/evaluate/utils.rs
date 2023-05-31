@@ -1,3 +1,5 @@
+
+
 use itertools::Itertools;
 use variter::VarIter;
 
@@ -83,9 +85,24 @@ pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
     unreachable!();
 }
 
+/// Verify that all cards in a slice are unique.
+pub fn all_unique(hand: &[Card]) -> bool {
+    let mut iter = hand.iter().copied().map(Card::unique_integer).sorted_unstable();
+
+    let Some(mut first) = iter.next() else { return true };
+    for next in iter {
+        if first == next {
+            return false;
+        }
+        first = next
+    }
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cards;
 
     #[test]
     fn combinations_generator_works() {
@@ -112,5 +129,17 @@ mod tests {
         next_check(0b00011010);
         next_check(0b00011100);
         next_check(0b00100011);
+    }
+
+    #[test]
+    fn check_all_unique() {
+        let cards: Vec<_> = cards!["Th", "Td", "Th"].try_collect().unwrap();
+        assert!(!all_unique(&cards));
+        let cards: Vec<_> = cards!["Th", "Th", "Td"].try_collect().unwrap();
+        assert!(!all_unique(&cards));
+        let cards: Vec<_> = cards!["Th", "5c", "3d", "Th"].try_collect().unwrap();
+        assert!(!all_unique(&cards));
+        let cards: Vec<_> = cards!["5c", "Th", "3d", "Th"].try_collect().unwrap();
+        assert!(!all_unique(&cards));
     }
 }

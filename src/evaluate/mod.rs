@@ -44,7 +44,7 @@ pub use class::EvalClass;
 #[doc(inline)]
 pub use eval::Eval;
 
-use crate::{card::Card, error::EvalError, evaluate::lookup_table::LookupTable, ext::AllUnique};
+use crate::{card::Card, error::EvalError, evaluate::lookup_table::LookupTable};
 
 /// This structure does all the heavy lifting of evaluating poker hands.
 ///
