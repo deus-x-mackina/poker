@@ -23,13 +23,13 @@ struct StaticEvaluator;
 impl EvaluatorTrait for StaticEvaluator {
     type Lookup = phf::Map<i32, Meta>;
 
-    fn flush_lookup(&self) -> &Self::Lookup { statics::FLUSH_LOOKUP }
+    fn flush_lookup(&self) -> &Self::Lookup { &statics::FLUSH_LOOKUP }
 
-    fn unsuited_lookup(&self) -> &Self::Lookup { statics::UNSUITED_LOOKUP }
+    fn unsuited_lookup(&self) -> &Self::Lookup { &statics::UNSUITED_LOOKUP }
 }
 
 mod statics {
-    include!("../../table.in");
+    include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 }
 
 /// Evaluate a hand using the static lookup table bundled with the library.
@@ -166,14 +166,14 @@ mod tests {
 
         // Flushes
         let fl = &EVALUATOR.0.flush_lookup;
-        for (key, value) in FLUSH_LOOKUP {
+        for (key, value) in &FLUSH_LOOKUP {
             assert_eq!(&fl[key], value, fail!());
         }
         assert_eq!(fl.len(), FLUSH_LOOKUP.len(), fail!());
 
         // Unsuited
         let us = &EVALUATOR.0.unsuited_lookup;
-        for (key, value) in UNSUITED_LOOKUP {
+        for (key, value) in &UNSUITED_LOOKUP {
             assert_eq!(&us[key], value, fail!());
         }
         assert_eq!(us.len(), UNSUITED_LOOKUP.len(), fail!());

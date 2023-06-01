@@ -27,11 +27,11 @@ rand = { version = "0.8", optional = true }
 # Misc
 cfg-if = "1"
 # Table caching
-phf = { version = "0.10", optional = true }
+phf = { version = "0.11", optional = true }
 
 [features]
 default = ["rand"]
-static_lookup = ["phf"]
+static_lookup = ["phf", "reqwest"]
 
 [profile.release]
 lto = true
@@ -52,6 +52,10 @@ colored = "2"
 rustyline-derive = "0.8"
 # Benching
 criterion = { version = "0.5", features = ["html_reports"] }
+
+[build-dependencies]
+# Fetching static lookup table
+reqwest = { version = "0.11", features = ["blocking"], optional = true }
 
 [[bench]]
 name = "evaluation"
