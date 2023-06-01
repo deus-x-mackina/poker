@@ -17,7 +17,7 @@ fn main() {
     let eval = Evaluator::new();
 
     // Generate a shuffled deck
-    let mut deck = Card::generate_shuffled_deck().to_vec();
+    let mut deck = Card::generate_shuffled_deck();
 
     // Deal a hand
     let hand: Vec<Card> = deck.drain(..5).collect();
