@@ -14,7 +14,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         let path = env::var("OUT_DIR").map(PathBuf::from)?.join("codegen.rs");
         let mut file = File::create(path)?;
-        file.write_all(&reqwest::blocking::get(URL)?.bytes()?)?;
+        let bytes = match reqwest::blocking::get(URL) {
+            Err(_) => panic!(
+                "You need to be connected to the internet in order to build `poker` with \
+                 `static_lookup`"
+            ),
+            Ok(response) => response.bytes()?,
+        };
+        file.write_all(&bytes)?;
     }
 
     Ok(())
