@@ -6,7 +6,7 @@ use variter::VarIter;
 use self::constants::*;
 use crate::{
     card::rank::Rank,
-    constants::{INT_RANKS_REV, PRIMES},
+    constants::{INT_RANKS, PRIMES},
     evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
 };
 
@@ -61,7 +61,7 @@ impl LookupTable {
         for _ in 0..1286 {
             let bits = gen.get_next();
             let mut not_straight = true;
-            for &straight in &STRAIGHTS {
+            for straight in STRAIGHTS {
                 // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add
                 // it to our vector
                 if bits ^ straight == 0 {
@@ -99,7 +99,7 @@ impl LookupTable {
         let mut prime_product;
 
         // Straight flushes and straights
-        for &straight in &STRAIGHTS {
+        for straight in STRAIGHTS {
             // We get the prime product using the bits
             prime_product = utils::prime_product_from_rank_bits(straight);
 
@@ -177,7 +177,6 @@ impl LookupTable {
     /// Calculate metadata for all hands where at least one rank is repeated.
     fn multiples(&mut self) {
         // We want backwards ranks so we can consider the best/highest card ranks first
-        // We can use INT_RANKS_REV
 
         // Reusable product holder
         let mut product;
@@ -190,9 +189,9 @@ impl LookupTable {
         let mut rank = WORST_STRAIGHT_FLUSH.wrapping_add(1);
 
         // First, select our rank that there will be 4x
-        for quad in INT_RANKS_REV {
+        for quad in INT_RANKS.rev() {
             // Then filter out our 4x rank so we can consider each possible kicker
-            let kickers = INT_RANKS_REV.into_iter().filter(|&kicker| kicker != quad);
+            let kickers = INT_RANKS.rev().filter(|&kicker| kicker != quad);
             for k in kickers {
                 // Get the prime product by hand, using `pow` if/when the card is present more
                 // than once
@@ -215,9 +214,9 @@ impl LookupTable {
         // We have one three of a kind (trips) and one (pair)
         rank = WORST_FOUR_OF_A_KIND.wrapping_add(1);
         // We select our trips rank...
-        for trips in INT_RANKS_REV {
+        for trips in INT_RANKS.rev() {
             // ...and select our pair rank
-            let pair_ranks = INT_RANKS_REV.into_iter().filter(|&pr| pr != trips);
+            let pair_ranks = INT_RANKS.rev().filter(|&pr| pr != trips);
             for pr in pair_ranks {
                 // And we calculate the prime product using power of 3 for the 3x rank and power
                 // of 2 for the 2x rank
@@ -238,9 +237,9 @@ impl LookupTable {
         // Three of a kind
         // One 3x rank and two unique kickers
         rank = WORST_STRAIGHT.wrapping_add(1);
-        for trips in INT_RANKS_REV {
-            let kickers = INT_RANKS_REV
-                .into_iter()
+        for trips in INT_RANKS.rev() {
+            let kickers = INT_RANKS
+                .rev()
                 .filter(|&kicker| kicker != trips)
                 .collect::<Vec<_>>();
             // We want every combination of two kickers
@@ -273,11 +272,12 @@ impl LookupTable {
 
         // We want want every combination of two card ranks together to consider as our
         // two pair ranks
-        let two_pairs_combos = utils::const_combos::<_, 2>(&INT_RANKS_REV);
+        let bw = INT_RANKS.rev().collect::<Vec<_>>();
+        let two_pairs_combos = utils::const_combos::<_, 2>(&bw);
         for [pair1, pair2] in two_pairs_combos {
             // Our kickers are any rank that isn't equal to one of our two pair ranks
-            let kickers = INT_RANKS_REV
-                .into_iter()
+            let kickers = INT_RANKS
+                .rev()
                 .filter(|&kicker| kicker != pair1 && kicker != pair2);
 
             for kicker in kickers {
@@ -300,9 +300,9 @@ impl LookupTable {
         // Pair
         // 1 pair rank and three unique kickers
         rank = WORST_TWO_PAIR.wrapping_add(1);
-        for pair_rank in INT_RANKS_REV {
-            let kickers = INT_RANKS_REV
-                .into_iter()
+        for pair_rank in INT_RANKS.rev() {
+            let kickers = INT_RANKS
+                .rev()
                 .filter(|&kicker| kicker != pair_rank)
                 .collect::<Vec<_>>();
 
