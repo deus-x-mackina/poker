@@ -264,12 +264,21 @@ impl Card {
     /// Like [`Card::generate_deck`], but generate a shuffled deck using
     /// [`rand`] and returned a boxed slice of [`Card`]s.
     #[cfg(feature = "rand")]
-    pub fn generate_shuffled_deck() -> Box<[Self]> {
+    pub fn generate_shuffled_deck() -> Vec<Self> {
+        Self::generate_shuffled_deck_with(&mut rand::thread_rng())
+    }
+
+    /// Like [`Card::generate_shuffled_deck`], but generate a shuffled deck
+    /// using anything that implements [`rand::Rng`].
+    #[cfg(feature = "rand")]
+    pub fn generate_shuffled_deck_with<R>(mut rng: &mut R) -> Vec<Card>
+    where
+        R: rand::Rng + ?Sized,
+    {
         use rand::prelude::*;
-        let mut rng = thread_rng();
-        let mut cards = Self::generate_deck().collect::<Box<_>>();
-        cards.shuffle(&mut rng);
-        cards
+        let mut deck = Self::generate_deck().collect::<Vec<_>>();
+        deck.shuffle(&mut rng);
+        deck
     }
 
     /// From an [`Iterator`] that yields strings, return a new [`Iterator`] that
