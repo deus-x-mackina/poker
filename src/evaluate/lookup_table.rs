@@ -177,7 +177,7 @@ impl LookupTable {
     /// Calculate metadata for all hands where at least one rank is repeated.
     fn multiples(&mut self) {
         // We want backwards ranks so we can consider the best/highest card ranks first
-        let backwards_ranks = INT_RANKS_REV;
+        // We can use INT_RANKS_REV
 
         // Reusable product holder
         let mut product;
@@ -190,9 +190,9 @@ impl LookupTable {
         let mut rank = WORST_STRAIGHT_FLUSH.wrapping_add(1);
 
         // First, select our rank that there will be 4x
-        for quad in backwards_ranks.clone() {
+        for quad in INT_RANKS_REV {
             // Then filter out our 4x rank so we can consider each possible kicker
-            let kickers = backwards_ranks.clone().filter(|&kicker| kicker != quad);
+            let kickers = INT_RANKS_REV.into_iter().filter(|&kicker| kicker != quad);
             for k in kickers {
                 // Get the prime product by hand, using `pow` if/when the card is present more
                 // than once
@@ -215,9 +215,9 @@ impl LookupTable {
         // We have one three of a kind (trips) and one (pair)
         rank = WORST_FOUR_OF_A_KIND.wrapping_add(1);
         // We select our trips rank...
-        for trips in backwards_ranks.clone() {
+        for trips in INT_RANKS_REV {
             // ...and select our pair rank
-            let pair_ranks = backwards_ranks.clone().filter(|&pr| pr != trips);
+            let pair_ranks = INT_RANKS_REV.into_iter().filter(|&pr| pr != trips);
             for pr in pair_ranks {
                 // And we calculate the prime product using power of 3 for the 3x rank and power
                 // of 2 for the 2x rank
@@ -238,9 +238,9 @@ impl LookupTable {
         // Three of a kind
         // One 3x rank and two unique kickers
         rank = WORST_STRAIGHT.wrapping_add(1);
-        for trips in backwards_ranks.clone() {
-            let kickers = backwards_ranks
-                .clone()
+        for trips in INT_RANKS_REV {
+            let kickers = INT_RANKS_REV
+                .into_iter()
                 .filter(|&kicker| kicker != trips)
                 .collect::<Vec<_>>();
             // We want every combination of two kickers
@@ -273,12 +273,11 @@ impl LookupTable {
 
         // We want want every combination of two card ranks together to consider as our
         // two pair ranks
-        let bw = backwards_ranks.clone().collect::<Vec<_>>();
-        let two_pairs_combos = utils::const_combos::<_, 2>(&bw);
+        let two_pairs_combos = utils::const_combos::<_, 2>(&INT_RANKS_REV);
         for [pair1, pair2] in two_pairs_combos {
             // Our kickers are any rank that isn't equal to one of our two pair ranks
-            let kickers = backwards_ranks
-                .clone()
+            let kickers = INT_RANKS_REV
+                .into_iter()
                 .filter(|&kicker| kicker != pair1 && kicker != pair2);
 
             for kicker in kickers {
@@ -301,9 +300,9 @@ impl LookupTable {
         // Pair
         // 1 pair rank and three unique kickers
         rank = WORST_TWO_PAIR.wrapping_add(1);
-        for pair_rank in backwards_ranks.clone() {
-            let kickers = backwards_ranks
-                .clone()
+        for pair_rank in INT_RANKS_REV {
+            let kickers = INT_RANKS_REV
+                .into_iter()
                 .filter(|&kicker| kicker != pair_rank)
                 .collect::<Vec<_>>();
 
