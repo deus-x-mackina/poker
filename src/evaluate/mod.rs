@@ -143,6 +143,8 @@ impl Evaluator {
     ///     .expect("couldn't evaluate hand");
     /// assert!(matches!(result.class(), EvalClass::Flush { .. }));
     /// ```
+    ///
+    /// [`box_cards!`]: crate::box_cards
     pub fn evaluate<C: AsRef<[Card]>>(&self, cards: C) -> Result<Eval, EvalError> {
         let cards = cards.as_ref();
         evaluation::evaluate(self, cards)

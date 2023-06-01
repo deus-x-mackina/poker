@@ -2,8 +2,8 @@
 ///
 /// # Examples
 ///
-/// Use [`card!`] with a capitalized rank and suit in order to get a
-/// `const`-friendly card. The capitalization is because the names fill in as
+/// Use [`card!`](crate::card!) with a capitalized rank and suit in order to get
+/// a `const`-friendly card. The capitalization is because the names fill in as
 /// enum variant names for [`Rank`] and [`Suit`]
 ///
 /// ```
