@@ -7,13 +7,13 @@ use crate::{
     Card, Eval, EvalError,
 };
 
-pub trait EvaluatorTrait {
+pub trait Evaluation {
     type Lookup: for<'a> Index<&'a i32, Output = Meta>;
     fn flush_lookup(&self) -> &Self::Lookup;
     fn unsuited_lookup(&self) -> &Self::Lookup;
 }
 
-impl EvaluatorTrait for super::Evaluator {
+impl Evaluation for super::Evaluator {
     type Lookup = FxHashMap<i32, Meta>;
 
     fn flush_lookup(&self) -> &Self::Lookup { &self.0.flush_lookup }
@@ -21,7 +21,7 @@ impl EvaluatorTrait for super::Evaluator {
     fn unsuited_lookup(&self) -> &Self::Lookup { &self.0.unsuited_lookup }
 }
 
-pub fn evaluate(evaluator: &impl EvaluatorTrait, cards: &[Card]) -> Result<Eval, EvalError> {
+pub fn evaluate(evaluator: &impl Evaluation, cards: &[Card]) -> Result<Eval, EvalError> {
     if utils::all_unique(cards) {
         match cards.len() {
             x if x < 5 => Err(EvalError::InvalidHandSize(x)),
@@ -36,7 +36,7 @@ pub fn evaluate(evaluator: &impl EvaluatorTrait, cards: &[Card]) -> Result<Eval,
     }
 }
 
-fn five(evaluator: &impl EvaluatorTrait, cards: [Card; 5]) -> Eval {
+fn five(evaluator: &impl Evaluation, cards: [Card; 5]) -> Eval {
     let uniques = cards.map(Card::unique_integer);
 
     let detect_flush = uniques.into_iter().fold(0xF000, |acc, x| acc & x) != 0;
@@ -51,7 +51,7 @@ fn five(evaluator: &impl EvaluatorTrait, cards: [Card; 5]) -> Eval {
     }
 }
 
-fn six_plus(evaluator: &impl EvaluatorTrait, cards: &[Card]) -> Eval {
+fn six_plus(evaluator: &impl Evaluation, cards: &[Card]) -> Eval {
     debug_assert!(cards.len() > 5);
     let mut current_max = Eval::WORST;
     let all_five_card_combos = utils::const_combos::<_, 5>(cards);

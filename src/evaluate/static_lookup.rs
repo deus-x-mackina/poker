@@ -13,23 +13,25 @@
 //! [`Evaluator`]: crate::Evaluator
 
 use super::{
-    evaluation::{self, EvaluatorTrait},
+    evaluation::{self, Evaluation},
     meta::Meta,
 };
 use crate::{Card, Eval, EvalError};
 
+// This module includes the automatically generated code, fetched at build time.
+mod statics {
+    include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
+}
+
+// Helper struct for implementing Evaluation without having an actual struct
 struct StaticEvaluator;
 
-impl EvaluatorTrait for StaticEvaluator {
+impl Evaluation for StaticEvaluator {
     type Lookup = phf::Map<i32, Meta>;
 
     fn flush_lookup(&self) -> &Self::Lookup { &statics::FLUSH_LOOKUP }
 
     fn unsuited_lookup(&self) -> &Self::Lookup { &statics::UNSUITED_LOOKUP }
-}
-
-mod statics {
-    include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
 }
 
 /// Evaluate a hand using the static lookup table bundled with the library.
