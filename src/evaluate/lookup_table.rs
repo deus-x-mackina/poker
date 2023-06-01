@@ -6,7 +6,7 @@ use variter::VarIter;
 use self::constants::*;
 use crate::{
     card::rank::Rank,
-    constants::{INT_RANKS, PRIMES},
+    constants::{INT_RANKS_REV, PRIMES},
     evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
 };
 
@@ -177,7 +177,7 @@ impl LookupTable {
     /// Calculate metadata for all hands where at least one rank is repeated.
     fn multiples(&mut self) {
         // We want backwards ranks so we can consider the best/highest card ranks first
-        let backwards_ranks = INT_RANKS.rev();
+        let backwards_ranks = INT_RANKS_REV;
 
         // Reusable product holder
         let mut product;
