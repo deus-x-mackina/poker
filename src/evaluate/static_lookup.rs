@@ -89,6 +89,8 @@ impl Evaluation for StaticEvaluator {
 /// let result = static_lookup::evaluate(box_cards!(board, hand)).expect("couldn't evaluate hand");
 /// assert!(matches!(result.class(), EvalClass::Flush { .. }));
 /// ```
+///
+/// [`box_cards!`]: crate::box_cards
 pub fn evaluate<C: AsRef<[Card]>>(cards: C) -> Result<Eval, EvalError> {
     let cards = cards.as_ref();
     evaluation::evaluate(&StaticEvaluator, cards)
