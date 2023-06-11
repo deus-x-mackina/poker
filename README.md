@@ -36,7 +36,7 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.4"
+poker = "0.5"
 ```
 
 ## Features
@@ -49,24 +49,21 @@ The second feature, which is also not enabled by default is `static_lookup`.
 Enabling this feature opens up the `poker::evaluate::static_lookup` module,
 which contains the free `evauluate` function. It works similar to
 `Evaluator::evaluate`, but semantically it uses a static data structure that
-does not rely on heap allocations.
-
-There is no real benefit to using the feature yet, but it is an experimental
-first step for possible `no_std` support in the future. To enable this feature:
+does not rely on heap allocations. Behind the scenes, the crate downloads data
+from [another repository](https://github.com/deus-x-mackina/poker-lookup-table)
+at build time and therefore won't have to construct this deterministic data at runtime.
 
 ```toml
 [dependencies]
 # To use without `rand`, add `default-features = false`
-poker = { version = "0.4", features = ["static_lookup"] }
+poker = { version = "0.5", features = ["static_lookup"] }
 ```
 
 ## A Note on Performance
 
-For readability, the `#[inline]` attribute has been removed from function
-declarations. In order to ensure `rustc` can make appropriate inlining and
-optimization decisions, remember to use link-time optimization in your release
-builds. This comes at the cost of slower compilation times. In your
-`Cargo.toml`:
+In order to ensure `rustc` can make appropriate inlining and optimization decisions,
+remember to use link-time optimization in your release builds. This comes at the cost
+of slower compilation times. In your `Cargo.toml`:
 
 ```toml
 [profile.release]

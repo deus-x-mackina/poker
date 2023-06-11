@@ -16,6 +16,8 @@ const WELCOME: &str = r#"Welcome to Jacks or Better video poker!
 To quit, enter "quit" or press CTRL+C.
 "#;
 
+
+
 fn main() {
     // Clear the screen
     clear_terminal!();
