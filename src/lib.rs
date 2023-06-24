@@ -76,7 +76,7 @@
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations)]
-#![doc(html_root_url = "https://docs.rs/poker/0.4")]
+#![doc(html_root_url = "https://docs.rs/poker/0.5")]
 
 #[cfg(doctest)]
 doc_comment::doctest!("../README.md");
