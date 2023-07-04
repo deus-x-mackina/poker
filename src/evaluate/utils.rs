@@ -1,12 +1,11 @@
 use std::array;
 
-use itertools::Itertools;
 use variter::VarIter;
 
 use crate::{
     card::{rank::Rank, Card},
     constants::{INT_RANKS, PRIMES},
-    evaluate::lookup_table,
+    evaluate::lookup_table, Suit,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -128,24 +127,43 @@ pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
 
 /// Verify that all cards in a slice are unique.
 pub fn all_unique(hand: &[Card]) -> bool {
-    let mut iter = hand
-        .iter()
-        .copied()
-        .map(Card::unique_integer)
-        .sorted_unstable();
-
-    let mut first = match iter.next() {
-        Some(first) => first,
-        None => return true,
-    };
-
-    for next in iter {
-        if first == next {
+    let mut card_flags = 0u64;
+    for &card in hand {
+        let card_flag = 1u64 << card_to_index(card);
+        if card_flags & card_flag != 0 {
             return false;
         }
-        first = next
+        card_flags |= card_flag;
     }
     true
+}
+
+// Given a card, will return a unique index from 0 to 51, inclusive.
+fn card_to_index(card: Card) -> u8 {
+    let suit_shift = match card.suit() {
+        Suit::Clubs => 0,
+        Suit::Diamonds => 13,
+        Suit::Hearts => 26,
+        Suit::Spades => 39,
+    };
+    
+    let rank_shift = match card.rank() {
+        Rank::Two => 0,
+        Rank::Three => 1,
+        Rank::Four => 2,
+        Rank::Five => 3,
+        Rank::Six => 4,
+        Rank::Seven => 5,
+        Rank::Eight => 6,
+        Rank::Nine => 7,
+        Rank::Ten => 8,
+        Rank::Jack => 9,
+        Rank::Queen => 10,
+        Rank::King => 11,
+        Rank::Ace => 12,
+    };
+    
+    suit_shift + rank_shift
 }
 
 #[cfg(test)]
