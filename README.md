@@ -92,8 +92,6 @@ following payout chart:
 | Two Pair        | 2                     |
 | Jacks or Better | 1                     |
 
-
-
 > ### DISCLAIMER
 >
 > The `jacks-or-better` example from the `poker` crate has themes of gambling
