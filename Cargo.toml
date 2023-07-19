@@ -17,7 +17,7 @@ bench = false
 
 [dependencies]
 # Some iterative algorithms
-itertools = "0.10"
+itertools = "0.11"
 # Iterate through enum variants
 variter = { version = "0.3", default-features = false }
 # Faster hashmaps
