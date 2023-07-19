@@ -43,7 +43,7 @@ codegen-units = 1
 
 [dev-dependencies]
 # Test - Share a LookupTable for testing - doesn't matter if destructors won't run
-lazy_static = "1.4"
+lazy_static = "1"
 # Test - run code examples in *.md files
 doc-comment = "0.3"
 # Examples
