@@ -18,8 +18,6 @@ bench = false
 [dependencies]
 # Some iterative algorithms
 itertools = "0.11"
-# Iterate through enum variants
-variter = { version = "0.3", default-features = false }
 # Faster hashmaps
 rustc-hash = "1"
 # Shuffle cards

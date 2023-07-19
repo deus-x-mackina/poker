@@ -1,7 +1,5 @@
 use std::array;
 
-use variter::VarIter;
-
 use crate::{
     card::{rank::Rank, Card},
     constants::{INT_RANKS, PRIMES},

@@ -65,7 +65,6 @@ use std::{
 };
 
 use itertools::Itertools;
-use variter::VarIter;
 
 #[doc(inline)]
 pub use self::{rank::Rank, suit::Suit};

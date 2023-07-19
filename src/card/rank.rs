@@ -3,45 +3,39 @@ use std::{
     fmt::{self, Write},
 };
 
-use variter::derive_var_iter;
-
-derive_var_iter! {
-    @impl_attr {
-        #[doc(hidden)]
-    }
-    #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-    /// An enumeration type for representing the thirteen card ranks, from two to ace.
-    ///
-    /// `Rank` has implemented [`Ord`] such that:
-    /// - 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < T < J < Q < K < A
-    pub enum Rank {
-        /// The rank of two, also called a deuce.
-        Two,
-        /// The rank of three, also called a trey.
-        Three,
-        /// The rank of four.
-        Four,
-        /// The rank of five.
-        Five,
-        /// The rank of six.
-        Six,
-        /// The rank of seven.
-        Seven,
-        /// The rank of eight.
-        Eight,
-        /// The rank of nine.
-        Nine,
-        /// The rank of ten.
-        Ten,
-        /// The rank of jack.
-        Jack,
-        /// The rank of queen.
-        Queen,
-        /// The rank of king.
-        King,
-        /// The rank of ace.
-        Ace,
-    }
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// An enumeration type for representing the thirteen card ranks, from two to
+/// ace.
+///
+/// `Rank` has implemented [`Ord`] such that:
+/// - 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < T < J < Q < K < A
+pub enum Rank {
+    /// The rank of two, also called a deuce.
+    Two,
+    /// The rank of three, also called a trey.
+    Three,
+    /// The rank of four.
+    Four,
+    /// The rank of five.
+    Five,
+    /// The rank of six.
+    Six,
+    /// The rank of seven.
+    Seven,
+    /// The rank of eight.
+    Eight,
+    /// The rank of nine.
+    Nine,
+    /// The rank of ten.
+    Ten,
+    /// The rank of jack.
+    Jack,
+    /// The rank of queen.
+    Queen,
+    /// The rank of king.
+    King,
+    /// The rank of ace.
+    Ace,
 }
 
 impl Rank {
@@ -159,6 +153,22 @@ impl Rank {
             Ace => "aces",
         }
     }
+    
+    pub(crate) const ALL_VARIANTS: &[Self] = &[
+        Self::Two,
+        Self::Three,
+        Self::Four,
+        Self::Five,
+        Self::Six,
+        Self::Seven,
+        Self::Eight,
+        Self::Nine,
+        Self::Ten,
+        Self::Jack,
+        Self::Queen,
+        Self::King,
+        Self::Ace,
+    ];
 }
 
 impl TryFrom<char> for Rank {

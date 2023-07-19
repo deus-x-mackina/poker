@@ -3,27 +3,23 @@ use std::{
     fmt::{self, Write},
 };
 
-use variter::derive_var_iter;
-
-derive_var_iter! {
-    @impl_attr {
-        #[doc(hidden)]
-    }
-    /// An enumeration type for representing the four card suits.
-    #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-    pub enum Suit {
-        /// The suit of clubs.
-        Clubs,
-        /// The suit of hearts.
-        Hearts,
-        /// The suit of spades.
-        Spades,
-        /// The suit of diamonds.
-        Diamonds,
-    }
+/// An enumeration type for representing the four card suits.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum Suit {
+    /// The suit of clubs.
+    Clubs,
+    /// The suit of hearts.
+    Hearts,
+    /// The suit of spades.
+    Spades,
+    /// The suit of diamonds.
+    Diamonds,
 }
 
 impl Suit {
+    pub(crate) const ALL_VARIANTS: &[Self] =
+        &[Self::Clubs, Self::Hearts, Self::Spades, Self::Diamonds];
+
     /// Get a Unicode representation of the suit, suitable for printing.
     ///
     /// # Example

@@ -1,7 +1,6 @@
 use std::hash::BuildHasherDefault;
 
 use rustc_hash::{FxHashMap, FxHasher};
-use variter::VarIter;
 
 use self::constants::*;
 use crate::{

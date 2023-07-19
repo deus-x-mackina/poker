@@ -936,7 +936,6 @@ dependencies = [
  "rustc-hash",
  "rustyline",
  "rustyline-derive",
- "variter",
 ]
 
 [[package]]
@@ -1484,12 +1483,6 @@ name = "utf8parse"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
-
-[[package]]
-name = "variter"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39d1e4b96372bdf67bff44df656b473d37698e861d1975f5423d90a4c5d232b7"
 
 [[package]]
 name = "vcpkg"
