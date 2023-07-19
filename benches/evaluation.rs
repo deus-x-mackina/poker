@@ -79,42 +79,12 @@ fn bench_all_5card_eval(c: &mut Criterion) {
     group.finish();
 }
 
-fn bench_all_7card_eval(c: &mut Criterion) {
-    let mut group = c.benchmark_group("all_7card_eval");
-    group.sample_size(10);
-    let eval = Evaluator::new();
-    let gen = Card::generate_deck().combinations(7).collect::<Box<_>>();
-
-    let routine = {
-        let eval = eval;
-        let gen = &gen;
-        move || {
-            for cards in gen.iter() {
-                let _ = eval.evaluate(cards);
-            }
-        }
-    };
-
-    group.bench_function("dynamic", |b| b.iter(&routine));
-
-    group.bench_function("static", |b| {
-        b.iter(|| {
-            for cards in gen.iter() {
-                let _ = static_lookup::evaluate(cards);
-            }
-        });
-    });
-
-    group.finish();
-}
-
 criterion_group!(
     benches,
     bench_evaluator,
     bench_single_5card_hand_eval,
     bench_single_7card_hand_eval,
     bench_all_5card_eval,
-    bench_all_7card_eval
 );
 
 criterion_main!(benches);
