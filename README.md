@@ -47,7 +47,7 @@ decks. This is enabled by default.
 
 The second feature, which is also not enabled by default is `static_lookup`.
 Enabling this feature opens up the `poker::evaluate::static_lookup` module,
-which contains the free `evauluate` function. It works similar to
+which contains the free `evaluate` function. It works similar to
 `Evaluator::evaluate`, but semantically it uses a static data structure that
 does not rely on heap allocations. Behind the scenes, the crate downloads data
 from [another repository](https://github.com/deus-x-mackina/poker-lookup-table)
@@ -76,10 +76,21 @@ lto = true # the default is false!
 `poker` includes two fun builtin examples: `poker-repl` and `jacks-or-better`.
 `poker-repl` is a `repl`-like environment when you can evaluate different poker
 hands. `jacks-or-better` is a terminal re-creation of the Jacks or Better video
-poker game. Payouts based on
-[this image](https://www.gamblingsites.com/wp-content/uploads/2016/08/video-poker-pay-table-jacks-or-better.png).
-Rules for the game can be found
-[here](https://www.onlinepoker.net/games/jacks-or-better).
+poker game. Rules for the game can be found
+[here](https://www.liveabout.com/jacks-or-better-video-poker-2727991), with the
+following payout chart:
+
+| 5-card hand     | Payout (bet multiple) |
+|-----------------|-----------------------|
+| Royal Flush     | 4000                  |
+| Straight Flush  | 250                   |
+| Four of a Kind  | 25                    |
+| Full House      | 9                     |
+| Flush           | 6                     |
+| Straight        | 4                     |
+| Three of a Kind | 3                     |
+| Two Pair        | 2                     |
+| Jacks or Better | 1                     |
 
 > ### DISCLAIMER
 >
