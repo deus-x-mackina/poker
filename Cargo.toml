@@ -47,9 +47,9 @@ lazy_static = "1.4"
 # Test - run code examples in *.md files
 doc-comment = "0.3"
 # Examples
-rustyline = "11"
+rustyline = "12"
 colored = "2"
-rustyline-derive = "0.8"
+rustyline-derive = "0.9"
 # Benching
 criterion = { version = "0.5", features = ["html_reports"] }
 
