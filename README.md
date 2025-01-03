@@ -41,11 +41,10 @@ poker = "0.5"
 
 ## Features
 
-`poker` currently has two features. One depends on the
-[`rand`](https://crates.io/crates/rand) crate, in order to shuffle generated
-decks. This is enabled by default.
+`poker` currently has two features. One depends on the [`rand`](https://crates.io/crates/rand)
+crate, in order to shuffle generated decks. This is enabled by default.
 
-The second feature, which is also not enabled by default is `static_lookup`.
+The second feature, which is **not** enabled by default is `static_lookup`.
 Enabling this feature opens up the `poker::evaluate::static_lookup` module,
 which contains the free `evaluate` function. It works similar to
 `Evaluator::evaluate`, but semantically it uses a static data structure that
@@ -59,18 +58,6 @@ at build time and therefore won't have to construct this deterministic data at r
 poker = { version = "0.5", features = ["static_lookup"] }
 ```
 
-## A Note on Performance
-
-In order to ensure `rustc` can make appropriate inlining and optimization decisions,
-remember to use link-time optimization in your release builds. This comes at the cost
-of slower compilation times. In your `Cargo.toml`:
-
-```toml
-[profile.release]
-# ...
-lto = true # the default is false!
-```
-
 ## Examples
 
 `poker` includes two fun builtin examples: `poker-repl` and `jacks-or-better`.
@@ -81,7 +68,7 @@ poker game. Rules for the game can be found
 following payout chart:
 
 | 5-card hand     | Payout (bet multiple) |
-|-----------------|-----------------------|
+| --------------- | --------------------- |
 | Royal Flush     | 4000                  |
 | Straight Flush  | 250                   |
 | Four of a Kind  | 25                    |
