@@ -81,15 +81,18 @@ fn main() {
 
         // Calculate winnings
         let winnings = payout(wager, second_eval.class());
-        let winnings_string = format!("Winnings: {}", winnings);
-        println!(
-            "{}",
+        let winnings_string = {
+            let s = format!("Winnings: {}", winnings);
             if winnings > 0 {
                 credits += wager + winnings;
-                winnings_string.as_str().bright_green().bold()
+                s.as_str().bright_green().bold()
             } else {
-                winnings_string.as_str().bright_red().bold()
+                s.as_str().bright_red().bold()
             }
+        };
+        println!(
+            "{}",
+            winnings_string
         );
         if credits == 0 {
             println!("{}", "Game over!".bright_red().bold());
