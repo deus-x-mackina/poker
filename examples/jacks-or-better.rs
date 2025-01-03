@@ -85,7 +85,7 @@ fn main() {
         println!(
             "{}",
             if winnings > 0 {
-                credits += winnings;
+                credits += wager + winnings;
                 winnings_string.as_str().bright_green().bold()
             } else {
                 winnings_string.as_str().bright_red().bold()
