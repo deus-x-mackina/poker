@@ -27,14 +27,8 @@ pub struct LookupTable {
 impl LookupTable {
     pub fn new() -> Self {
         let mut table = Self {
-            flush_lookup: FxHashMap::with_capacity_and_hasher(
-                6175,
-                FxBuildHasher,
-            ),
-            unsuited_lookup: FxHashMap::with_capacity_and_hasher(
-                1287,
-                FxBuildHasher,
-            ),
+            flush_lookup: FxHashMap::with_capacity_and_hasher(6175, FxBuildHasher),
+            unsuited_lookup: FxHashMap::with_capacity_and_hasher(1287, FxBuildHasher),
         };
         table.flushes_straights_high_cards();
         table.multiples();

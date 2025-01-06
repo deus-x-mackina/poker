@@ -47,7 +47,7 @@ impl Evaluation for StaticEvaluator {
 ///
 /// This function will fail if the total number of cards is less than five,
 /// or if not all the cards passed in are unique. See
-/// [`EvalError`](crate::EvalError) for more.
+/// [`EvalError`] for more.
 ///
 /// # Performance
 ///
