@@ -50,14 +50,14 @@
 //! # fn run() -> Result<(), Box<dyn std::error::Error>> {
 //! use std::{cmp, sync::Arc, thread};
 //!
-//! use poker::{Card, Eval, Evaluator};
+//! use poker::{deck, Eval, Evaluator};
 //!
 //! let shared_evaluator = Arc::new(Evaluator::new());
 //! let mut handles = vec![];
 //! for _ in 0..10 {
 //!     let evaluator = Arc::clone(&shared_evaluator);
 //!     handles.push(thread::spawn(move || {
-//!         let deck = Card::generate_shuffled_deck();
+//!         let deck = deck::shuffled();
 //!         let hand = &deck[..5];
 //!         evaluator.evaluate(hand).unwrap_or(Eval::WORST)
 //!     }));
@@ -83,6 +83,7 @@ doc_comment::doctest!("../README.md");
 
 pub mod card;
 mod constants;
+pub mod deck;
 pub mod error;
 pub mod evaluate;
 

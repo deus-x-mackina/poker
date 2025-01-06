@@ -103,6 +103,7 @@ mod tests {
     use super::{evaluate, statics::*};
     use crate::{
         card::Card,
+        deck,
         evaluate::{
             hand_rank::PokerHandRank,
             tests::{FiveCardHand, RepresentativeHand, SevenCardHand, SixCardHand, EVALUATOR},
@@ -112,7 +113,7 @@ mod tests {
 
     #[test]
     fn test_all_five_card_combos() {
-        let deck = Card::generate_deck().collect::<Vec<_>>();
+        let deck = deck::generate().collect::<Vec<_>>();
         let gen = utils::const_combos::<_, 5>(&deck);
         let evals = gen.fold(HashSet::with_capacity(7462), |mut ints, hand| {
             ints.insert(evaluate(&hand).unwrap());

@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use colored::Colorize;
 use itertools::Itertools;
-use poker::{Card, EvalClass, Evaluator, Rank};
+use poker::{deck, Card, EvalClass, Evaluator, Rank};
 use rand::prelude::*;
 
 #[macro_use]
@@ -16,8 +16,6 @@ const WELCOME: &str = r#"Welcome to Jacks or Better video poker!
 To quit, enter "quit" or press CTRL+C.
 "#;
 
-
-
 fn main() {
     // Clear the screen
     clear_terminal!();
@@ -29,7 +27,7 @@ fn main() {
     let mut rl = common::editor();
 
     // Game setup
-    let mut deck = Card::generate_shuffled_deck().to_vec();
+    let mut deck = deck::shuffled().to_vec();
     let mut credits = STARTING_CREDITS;
     let mut hand = Vec::with_capacity(5);
 
@@ -90,10 +88,7 @@ fn main() {
                 s.as_str().bright_red().bold()
             }
         };
-        println!(
-            "{}",
-            winnings_string
-        );
+        println!("{}", winnings_string);
         if credits == 0 {
             println!("{}", "Game over!".bright_red().bold());
             break 'game;

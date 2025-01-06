@@ -3,7 +3,8 @@ use std::array;
 use crate::{
     card::{rank::Rank, Card},
     constants::{INT_RANKS, PRIMES},
-    evaluate::lookup_table, Suit,
+    evaluate::lookup_table,
+    Suit,
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -144,7 +145,7 @@ fn card_to_index(card: Card) -> u8 {
         Suit::Hearts => 26,
         Suit::Spades => 39,
     };
-    
+
     let rank_shift = match card.rank() {
         Rank::Two => 0,
         Rank::Three => 1,
@@ -160,7 +161,7 @@ fn card_to_index(card: Card) -> u8 {
         Rank::King => 11,
         Rank::Ace => 12,
     };
-    
+
     suit_shift + rank_shift
 }
 

@@ -39,6 +39,22 @@ pub enum Rank {
 }
 
 impl Rank {
+    pub(crate) const ALL_VARIANTS: &[Self] = &[
+        Self::Two,
+        Self::Three,
+        Self::Four,
+        Self::Five,
+        Self::Six,
+        Self::Seven,
+        Self::Eight,
+        Self::Nine,
+        Self::Ten,
+        Self::Jack,
+        Self::Queen,
+        Self::King,
+        Self::Ace,
+    ];
+
     /// Get a textual representation of the rank. The character returned is the
     /// same character expected when parsing a rank from strings.
     ///
@@ -153,22 +169,6 @@ impl Rank {
             Ace => "aces",
         }
     }
-    
-    pub(crate) const ALL_VARIANTS: &[Self] = &[
-        Self::Two,
-        Self::Three,
-        Self::Four,
-        Self::Five,
-        Self::Six,
-        Self::Seven,
-        Self::Eight,
-        Self::Nine,
-        Self::Ten,
-        Self::Jack,
-        Self::Queen,
-        Self::King,
-        Self::Ace,
-    ];
 }
 
 impl TryFrom<char> for Rank {

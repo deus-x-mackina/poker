@@ -10,14 +10,14 @@ and the algorithms found within, with mild adaptations and some personal touches
 to try to make it as idiomatic as possible in Rust.
 
 ```rust
-use poker::{Evaluator, cards, Card};
+use poker::{Evaluator, deck, Card};
 
 fn main() {
     // Create a hand evaluator
     let eval = Evaluator::new();
 
     // Generate a shuffled deck
-    let mut deck = Card::generate_shuffled_deck();
+    let mut deck = deck::shuffled();
 
     // Deal a hand
     let hand: Vec<Card> = deck.drain(..5).collect();

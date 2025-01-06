@@ -1,6 +1,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use itertools::Itertools;
-use poker::{cards, evaluate::static_lookup, Card, Evaluator};
+use poker::{cards, deck, evaluate::static_lookup, Evaluator};
 
 fn bench_evaluator(c: &mut Criterion) {
     c.bench_function("Evaluator::new()", |b| b.iter(Evaluator::new));
@@ -23,7 +23,7 @@ fn bench_single_5card_hand_eval(c: &mut Criterion) {
             let _ = static_lookup::evaluate(&hand);
         })
     });
-    
+
     group.finish();
 }
 
@@ -46,7 +46,7 @@ fn bench_single_7card_hand_eval(c: &mut Criterion) {
             let _ = static_lookup::evaluate(&hand);
         })
     });
-    
+
     group.finish();
 }
 
@@ -54,7 +54,7 @@ fn bench_all_5card_eval(c: &mut Criterion) {
     let mut group = c.benchmark_group("all_5card_eval");
     group.sample_size(10);
     let eval = Evaluator::new();
-    let gen = Card::generate_deck().combinations(5).collect::<Box<_>>();
+    let gen = deck::generate().combinations(5).collect::<Box<_>>();
 
     let routine = {
         let eval = eval;

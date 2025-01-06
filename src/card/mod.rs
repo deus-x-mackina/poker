@@ -64,8 +64,6 @@ use std::{
     str::FromStr,
 };
 
-use itertools::Itertools;
-
 #[doc(inline)]
 pub use self::{rank::Rank, suit::Suit};
 use crate::{constants::PRIMES, error::ParseCardError};
@@ -234,52 +232,6 @@ impl Card {
         s
     }
 
-    /// Generate an iterator that will yield every card in a standard 52-card
-    /// deck once. The order in which the cards are yielded is **not**
-    /// random.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use std::collections::HashSet;
-    ///
-    /// use poker::Card;
-    ///
-    /// let deck: Vec<_> = Card::generate_deck().collect();
-    /// assert_eq!(deck.len(), 52);
-    /// let mut unique_cards = HashSet::new();
-    /// for card in deck {
-    ///     // `insert()` returns false if the item is already present
-    ///     assert!(unique_cards.insert(card));
-    /// }
-    /// ```
-    pub fn generate_deck() -> impl Iterator<Item = Self> {
-        Rank::ALL_VARIANTS
-            .iter()
-            .cartesian_product(Suit::ALL_VARIANTS.iter())
-            .map(|(&rank, &suit)| Self::new(rank, suit))
-    }
-
-    /// Like [`Card::generate_deck`], but generate a shuffled deck using
-    /// [`rand`] and returned a boxed slice of [`Card`]s.
-    #[cfg(feature = "rand")]
-    pub fn generate_shuffled_deck() -> Vec<Self> {
-        Self::generate_shuffled_deck_with(&mut rand::thread_rng())
-    }
-
-    /// Like [`Card::generate_shuffled_deck`], but generate a shuffled deck
-    /// using anything that implements [`rand::Rng`].
-    #[cfg(feature = "rand")]
-    pub fn generate_shuffled_deck_with<R>(mut rng: &mut R) -> Vec<Card>
-    where
-        R: rand::Rng + ?Sized,
-    {
-        use rand::prelude::*;
-        let mut deck = Self::generate_deck().collect::<Vec<_>>();
-        deck.shuffle(&mut rng);
-        deck
-    }
-
     /// From an [`Iterator`] that yields strings, return a new [`Iterator`] that
     /// yields `Result<Card, ParseCardError>`. The iterator adaoptor returned by
     /// this associated function has a special method [`try_collect`], which
@@ -430,8 +382,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::collections::{HashMap, HashSet};
-
     use super::*;
 
     #[test]
@@ -482,41 +432,5 @@ mod tests {
                 );
             }
         }
-    }
-
-    #[test]
-    fn card_integers_unique() {
-        let deck = Card::generate_deck();
-        let mut ints = HashSet::with_capacity(52);
-        deck.into_iter().for_each(|card| {
-            assert!(ints.insert(card.unique_integer));
-        });
-        assert_eq!(ints.len(), 52);
-    }
-
-    #[test]
-    fn card_suit_and_rank_calculations() {
-        let deck = Card::generate_deck();
-        let mut suits = HashMap::with_capacity(4);
-        let mut ranks = HashMap::with_capacity(13);
-        for card in deck {
-            let suit_count = suits.entry(card.suit()).or_insert(0);
-            let rank_count = ranks.entry(card.rank()).or_insert(0);
-            *suit_count += 1;
-            *rank_count += 1;
-        }
-        assert!(suits.into_iter().all(|(_, count)| count == 13));
-        assert!(ranks.into_iter().all(|(_, count)| count == 4));
-    }
-
-    #[test]
-    fn generate_deck_is_52_cards() {
-        assert_eq!(Card::generate_deck().count(), 52);
-    }
-
-    #[test]
-    #[cfg(feature = "rand")]
-    fn generate_shuffled_deck_is_52_cards() {
-        assert_eq!(Card::generate_shuffled_deck().len(), 52);
     }
 }
