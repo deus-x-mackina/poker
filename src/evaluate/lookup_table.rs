@@ -1,6 +1,4 @@
-use std::hash::BuildHasherDefault;
-
-use rustc_hash::{FxHashMap, FxHasher};
+use rustc_hash::{FxBuildHasher, FxHashMap};
 
 use self::constants::*;
 use crate::{
@@ -31,11 +29,11 @@ impl LookupTable {
         let mut table = Self {
             flush_lookup: FxHashMap::with_capacity_and_hasher(
                 6175,
-                BuildHasherDefault::<FxHasher>::default(),
+                FxBuildHasher,
             ),
             unsuited_lookup: FxHashMap::with_capacity_and_hasher(
                 1287,
-                BuildHasherDefault::<FxHasher>::default(),
+                FxBuildHasher,
             ),
         };
         table.flushes_straights_high_cards();
