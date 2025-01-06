@@ -25,10 +25,10 @@ mod statics {
 
     // Empty maps for docs.rs
     #[cfg(docsrs)]
-    pub static FLUSH_LOOKUP: ::phf::Map<i32, crate::meta::Meta> = ::phf::Map::new();
+    pub static FLUSH_LOOKUP: ::phf::Map<i32, crate::evaluate::meta::Meta> = ::phf::Map::new();
 
     #[cfg(docsrs)]
-    pub static UNSUITED_LOOKUP: ::phf::Map<i32, crate::meta::Meta> = ::phf::Map::new();
+    pub static UNSUITED_LOOKUP: ::phf::Map<i32, crate::evaluate::meta::Meta> = ::phf::Map::new();
 }
 
 // Helper struct for implementing Evaluation without having an actual struct
