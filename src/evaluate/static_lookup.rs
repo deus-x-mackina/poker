@@ -20,7 +20,16 @@ use crate::{Card, Eval, EvalError};
 
 // This module includes the automatically generated code, fetched at build time.
 mod statics {
+    #[cfg(not(docsrs))]
     include!(concat!(env!("OUT_DIR"), "/codegen.rs"));
+
+
+    // Empty maps for docs.rs
+    #[cfg(docsrs)]
+    pub static FLUSH_LOOKUP: ::phf::Map<i32, crate::meta::Meta> = ::phf::Map::new();
+
+    #[cfg(docsrs)]
+    pub static UNSUITED_LOOKUP: ::phf::Map<i32, crate::meta::Meta> = ::phf::Map::new();
 }
 
 // Helper struct for implementing Evaluation without having an actual struct

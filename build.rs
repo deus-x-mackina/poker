@@ -6,7 +6,7 @@ const URL: &str =
     "https://raw.githubusercontent.com/deus-x-mackina/poker-lookup-table/main/codegen.txt";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if !cfg!(feature = "static_lookup") {
+    if !cfg!(feature = "static_lookup") || cfg!(docsrs) {
         return Ok(());
     }
 
