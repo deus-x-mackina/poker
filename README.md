@@ -36,7 +36,7 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.5"
+poker = "0.6"
 ```
 
 ## Features
@@ -55,7 +55,7 @@ at build time and therefore won't have to construct this deterministic data at r
 ```toml
 [dependencies]
 # To use without `rand`, add `default-features = false`
-poker = { version = "0.5", features = ["static_lookup"] }
+poker = { version = "0.6", features = ["static_lookup"] }
 ```
 
 ## Examples

@@ -1,8 +1,8 @@
 //! # Poker
 //!
 //! `poker` is a crate for efficient poker hand evaluation ported into Rust from
-//! the [`treys`] Python package. This packages introduces the algorithms that
-//! are vital for speedy evaluation, which have been added on to or made more
+//! the [`treys`] Python package. This package utilizes algorithms
+//! for speedy evaluation, which have been added on to or made more
 //! idiomatic for Rust where appropriate.
 //!
 //! ```
@@ -76,7 +76,7 @@
 
 #![forbid(unsafe_code)]
 #![warn(missing_docs, missing_debug_implementations)]
-#![doc(html_root_url = "https://docs.rs/poker/0.5")]
+#![doc(html_root_url = "https://docs.rs/poker/0.6")]
 
 #[cfg(doctest)]
 doc_comment::doctest!("../README.md");
