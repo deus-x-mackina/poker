@@ -37,6 +37,7 @@ pub mod lookup_table;
 mod meta;
 #[cfg(feature = "static_lookup")]
 pub mod static_lookup;
+pub mod three_card;
 mod utils;
 
 #[doc(inline)]
