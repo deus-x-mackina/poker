@@ -18,7 +18,7 @@ use crate::{
 /// first checks to make sure the hand is not suited, then indexes into the
 /// unsuited lookup to find that `unsuited_lookup\[2730\]` is equal
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LookupTable {
     pub flush_lookup: FxHashMap<i32, Meta>,
     pub unsuited_lookup: FxHashMap<i32, Meta>,
@@ -353,6 +353,12 @@ pub mod constants {
         0b0_0000_0001_1111, // 31 => 23456
         0b1_0000_0000_1111, // 4111 => A2345
     ];
+}
+
+impl Default for LookupTable {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
