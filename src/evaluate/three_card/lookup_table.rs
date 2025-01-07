@@ -16,7 +16,7 @@ use rustc_hash::{FxBuildHasher, FxHashMap};
 /// ----------------------
 /// Total            = 741
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LookupTable {
     pub flush_lookup: FxHashMap<i32, Meta>,
     pub unsuited_lookup: FxHashMap<i32, Meta>,
@@ -122,7 +122,13 @@ impl LookupTable {
     }
 }
 
-mod constants {
+impl Default for LookupTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+pub mod constants {
     pub const WORST_STRAIGHT_FLUSH: i16 = 12;
     pub const WORST_THREE_OF_A_KIND: i16 = 25;
     pub const WORST_STRAIGHT: i16 = 37;
