@@ -35,6 +35,7 @@ mod hand_rank;
 #[doc(hidden)]
 pub mod lookup_table;
 mod meta;
+mod poker_type;
 #[cfg(feature = "static_lookup")]
 pub mod static_lookup;
 #[doc(hidden)]
