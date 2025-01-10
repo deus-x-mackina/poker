@@ -1,25 +1,34 @@
-use crate::Rank;
+use std::marker::PhantomData;
+
+use crate::evaluate::poker_type::{PokerType, ThreeCard};
 
 use super::lookup_table::constants::*;
 
 /// Three-card metadata isn't an `enum`; the hand type can be figured out
 /// by examining the `hand_rank` field.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Meta {
-    pub hand_rank: i16,
-    pub card_rank: Rank,
+pub struct Meta<P> {
+    /// The rank of the poker hand.
+    hand_rank: i16,
+    /// Extra info about cards in the hand (e.g., pair of `Jacks` vs `Tens`).
+    /// Can encode information for 1 or 2 ranks, as bitfields:
+    /// 1 << 0 = 2
+    /// 1 << 12 = Ace
+    rank_flags: i16,
+    /// Marks metadata as a three- or five-card poker hand.
+    _poker_type: PhantomData<P>,
 }
 
-impl Meta {
-    pub const BEST: Self = Self {
-        hand_rank: 1,
-        card_rank: Rank::Ace,
-    };
+impl<P: PokerType> Meta<P> {
+    pub const fn new(hand_rank: i16, rank_flags: i16) -> Self {
+        Self { hand_rank, rank_flags, _poker_type: PhantomData }
+    }
+}
 
-    pub const WORST: Self = Self {
-        hand_rank: super::lookup_table::constants::WORST_HIGH_CARD,
-        card_rank: Rank::Five,
-    };
+impl Meta<ThreeCard> {
+    pub const BEST: Self = Self::new(1, 1 << 12);
+
+    pub const WORST: Self = Self::new(WORST_HIGH_CARD, 1 << 3);
 
     pub const fn is_high_card(self) -> bool {
         const BEST: i16 = WORST_PAIR + 1;
