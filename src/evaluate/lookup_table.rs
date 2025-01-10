@@ -95,7 +95,7 @@ impl LookupTable {
             prime_product = utils::prime_product_from_rank_bits(straight);
 
             // We also obtain the highest rank from the bits
-            high_rank = utils::high_rank_from_rank_bits(straight);
+            high_rank = utils::high_rank_from_rank_bits_five(straight);
 
             // Into the flush table we map the prime product to a straight flush
             // the has our current `rank_suited` value and the highest card's rank
@@ -139,7 +139,7 @@ impl LookupTable {
             prime_product = utils::prime_product_from_rank_bits(bits);
 
             // Get the highest card's rank
-            high_rank = utils::high_rank_from_rank_bits(bits);
+            high_rank = utils::high_rank_from_rank_bits_five(bits);
 
             // In the flush table, map the prime product to a flush
             self.flush_lookup.insert(
