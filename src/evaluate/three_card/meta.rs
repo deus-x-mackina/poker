@@ -1,8 +1,7 @@
 use std::marker::PhantomData;
 
-use crate::evaluate::poker_type::{PokerType, ThreeCard};
-
 use super::lookup_table::constants::*;
+use crate::evaluate::poker_type::{PokerType, ThreeCard};
 
 /// Three-card metadata isn't an `enum`; the hand type can be figured out
 /// by examining the `hand_rank` field.
@@ -21,13 +20,16 @@ pub struct Meta<P> {
 
 impl<P: PokerType> Meta<P> {
     pub const fn new(hand_rank: i16, rank_flags: i16) -> Self {
-        Self { hand_rank, rank_flags, _poker_type: PhantomData }
+        Self {
+            hand_rank,
+            rank_flags,
+            _poker_type: PhantomData,
+        }
     }
 }
 
 impl Meta<ThreeCard> {
     pub const BEST: Self = Self::new(1, 1 << 12);
-
     pub const WORST: Self = Self::new(WORST_HIGH_CARD, 1 << 3);
 
     pub const fn is_high_card(self) -> bool {

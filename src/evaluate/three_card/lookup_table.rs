@@ -1,12 +1,19 @@
-use crate::{constants::{INT_RANKS, PRIMES}, evaluate::{poker_type::ThreeCard, utils::{self, BitSequence}}};
-
-use super::meta::Meta;
-
-use constants::{STRAIGHTS, WORST_FLUSH, WORST_PAIR, WORST_STRAIGHT, WORST_STRAIGHT_FLUSH, WORST_THREE_OF_A_KIND};
+use constants::{
+    STRAIGHTS, WORST_FLUSH, WORST_PAIR, WORST_STRAIGHT, WORST_STRAIGHT_FLUSH, WORST_THREE_OF_A_KIND,
+};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
+use super::meta::Meta;
+use crate::{
+    constants::{INT_RANKS, PRIMES},
+    evaluate::{
+        poker_type::ThreeCard,
+        utils::{self, BitSequence},
+    },
+};
+
 /// Three card hands:
-/// 
+///
 /// 1. Straight flush   12
 /// 2. Three of a kind  13
 /// 3. Straight         12
@@ -59,7 +66,8 @@ impl LookupTable {
         for straight in STRAIGHTS {
             prime_product = utils::prime_product_from_rank_bits(straight);
             rank_flags = utils::high_rank_from_rank_bits_three(straight);
-            self.flush_lookup.insert(prime_product, Meta::new(rank_unsuited, rank_flags));
+            self.flush_lookup
+                .insert(prime_product, Meta::new(rank_unsuited, rank_flags));
             rank_suited = rank_suited.wrapping_add(1);
             rank_unsuited = rank_unsuited.wrapping_add(1);
         }
@@ -70,8 +78,10 @@ impl LookupTable {
         for bits in not_straights.into_iter().rev() {
             prime_product = utils::prime_product_from_rank_bits(bits);
             rank_flags = utils::high_rank_from_rank_bits_three(bits);
-            self.flush_lookup.insert(prime_product, Meta::new(rank_suited, rank_flags));
-            self.unsuited_lookup.insert(prime_product, Meta::new(rank_unsuited, rank_flags));
+            self.flush_lookup
+                .insert(prime_product, Meta::new(rank_suited, rank_flags));
+            self.unsuited_lookup
+                .insert(prime_product, Meta::new(rank_unsuited, rank_flags));
             rank_suited = rank_suited.wrapping_add(1);
             rank_unsuited = rank_unsuited.wrapping_add(1);
         }
@@ -85,7 +95,10 @@ impl LookupTable {
 
         for trips in INT_RANKS.rev() {
             product = PRIMES[trips as usize].wrapping_pow(3);
-            self.unsuited_lookup.insert(product, Meta::new(hand_rank, 1i16.wrapping_shl(trips as u32)));
+            self.unsuited_lookup.insert(
+                product,
+                Meta::new(hand_rank, 1i16.wrapping_shl(trips as u32)),
+            );
             hand_rank = hand_rank.wrapping_add(1);
         }
 
@@ -95,8 +108,13 @@ impl LookupTable {
         for pair in INT_RANKS.rev() {
             let kickers = INT_RANKS.rev().filter(|&i| i != pair);
             for kicker in kickers {
-                product = PRIMES[pair as usize].wrapping_pow(2).wrapping_mul(PRIMES[kicker as usize]);
-                self.unsuited_lookup.insert(product, Meta::new(hand_rank, 1i16.wrapping_shl(pair as u32)));
+                product = PRIMES[pair as usize]
+                    .wrapping_pow(2)
+                    .wrapping_mul(PRIMES[kicker as usize]);
+                self.unsuited_lookup.insert(
+                    product,
+                    Meta::new(hand_rank, 1i16.wrapping_shl(pair as u32)),
+                );
                 hand_rank = hand_rank.wrapping_add(1);
             }
         }
@@ -104,9 +122,7 @@ impl LookupTable {
 }
 
 impl Default for LookupTable {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 pub mod constants {

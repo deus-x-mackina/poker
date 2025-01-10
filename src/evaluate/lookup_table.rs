@@ -356,9 +356,7 @@ pub mod constants {
 }
 
 impl Default for LookupTable {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 #[cfg(test)]

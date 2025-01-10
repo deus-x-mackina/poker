@@ -8,7 +8,5 @@ mod meta;
 pub struct Evaluator(LookupTable);
 
 impl Evaluator {
-    pub fn new() -> Self {
-        Self(LookupTable::new())
-    }
+    pub fn new() -> Self { Self(LookupTable::new()) }
 }
