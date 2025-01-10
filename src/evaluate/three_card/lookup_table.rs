@@ -1,4 +1,4 @@
-use crate::{constants::{INT_RANKS, PRIMES}, evaluate::utils::{self, BitSequence}, Rank};
+use crate::{constants::{INT_RANKS, PRIMES}, evaluate::{poker_type::ThreeCard, utils::{self, BitSequence}}};
 
 use super::meta::Meta;
 
@@ -18,8 +18,8 @@ use rustc_hash::{FxBuildHasher, FxHashMap};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LookupTable {
-    pub flush_lookup: FxHashMap<i32, Meta>,
-    pub unsuited_lookup: FxHashMap<i32, Meta>,
+    pub flush_lookup: FxHashMap<i32, Meta<ThreeCard>>,
+    pub unsuited_lookup: FxHashMap<i32, Meta<ThreeCard>>,
 }
 
 impl LookupTable {
@@ -50,23 +50,16 @@ impl LookupTable {
             }
         }
 
-        let mut rank_suited = 1;
-        let mut rank_unsuited = WORST_THREE_OF_A_KIND + 1;
+        let mut rank_suited: i16 = 1;
+        let mut rank_unsuited: i16 = WORST_THREE_OF_A_KIND + 1;
 
-        let mut high_rank;
+        let mut rank_flags;
         let mut prime_product;
 
         for straight in STRAIGHTS {
             prime_product = utils::prime_product_from_rank_bits(straight);
-            high_rank = utils::high_rank_from_rank_bits(straight);
-            self.flush_lookup.insert(prime_product, Meta {
-                hand_rank: rank_suited,
-                card_rank: high_rank,
-            });
-            self.unsuited_lookup.insert(prime_product, Meta {
-                hand_rank: rank_unsuited,
-                card_rank: high_rank,
-            });
+            rank_flags = utils::high_rank_from_rank_bits_three(straight);
+            self.flush_lookup.insert(prime_product, Meta::new(rank_unsuited, rank_flags));
             rank_suited = rank_suited.wrapping_add(1);
             rank_unsuited = rank_unsuited.wrapping_add(1);
         }
@@ -76,15 +69,9 @@ impl LookupTable {
 
         for bits in not_straights.into_iter().rev() {
             prime_product = utils::prime_product_from_rank_bits(bits);
-            high_rank = utils::high_rank_from_rank_bits(bits);
-            self.flush_lookup.insert(prime_product, Meta {
-                hand_rank: rank_suited,
-                card_rank: high_rank
-            });
-            self.unsuited_lookup.insert(prime_product, Meta {
-                hand_rank: rank_unsuited,
-                card_rank: high_rank,
-            });
+            rank_flags = utils::high_rank_from_rank_bits_three(bits);
+            self.flush_lookup.insert(prime_product, Meta::new(rank_suited, rank_flags));
+            self.unsuited_lookup.insert(prime_product, Meta::new(rank_unsuited, rank_flags));
             rank_suited = rank_suited.wrapping_add(1);
             rank_unsuited = rank_unsuited.wrapping_add(1);
         }
@@ -98,10 +85,7 @@ impl LookupTable {
 
         for trips in INT_RANKS.rev() {
             product = PRIMES[trips as usize].wrapping_pow(3);
-            self.unsuited_lookup.insert(product, Meta {
-                hand_rank,
-                card_rank: Rank::ALL_VARIANTS[trips as usize],
-            });
+            self.unsuited_lookup.insert(product, Meta::new(hand_rank, 1i16.wrapping_shl(trips as u32)));
             hand_rank = hand_rank.wrapping_add(1);
         }
 
@@ -112,10 +96,7 @@ impl LookupTable {
             let kickers = INT_RANKS.rev().filter(|&i| i != pair);
             for kicker in kickers {
                 product = PRIMES[pair as usize].wrapping_pow(2).wrapping_mul(PRIMES[kicker as usize]);
-                self.unsuited_lookup.insert(product, Meta {
-                    hand_rank,
-                    card_rank: Rank::ALL_VARIANTS[pair as usize],
-                });
+                self.unsuited_lookup.insert(product, Meta::new(hand_rank, 1i16.wrapping_shl(pair as u32)));
                 hand_rank = hand_rank.wrapping_add(1);
             }
         }
