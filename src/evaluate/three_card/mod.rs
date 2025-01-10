@@ -1,9 +1,5 @@
 use lookup_table::LookupTable;
 
-use crate::Card;
-
-use super::evaluation::Evaluation;
-
 #[doc(hidden)]
 pub mod lookup_table;
 mod meta;
