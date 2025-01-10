@@ -21,8 +21,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut file = File::create(path)?;
         let bytes = match reqwest::blocking::get(URL) {
             Err(_) => panic!(
-                "You need to be connected to the internet in order to build `poker` with \
-                 `static_lookup`"
+                "Unable to download static lookup tables with feature `static_lookup`. \
+                Ensure you are connected to the internet and the build script has permissions to access \
+                the internet."
             ),
             Ok(response) => response.bytes()?,
         };
