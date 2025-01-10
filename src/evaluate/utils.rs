@@ -111,14 +111,26 @@ pub fn prime_product_from_hand(hand: [Card; 5]) -> i32 {
 }
 
 /// Obtain the high card from a given set of rank bits bit-ORed together.
-pub fn high_rank_from_rank_bits(rank_bits: i16) -> Rank {
-    // We don't want to return an Ace as the high card if it's a five-high straight
+pub fn high_rank_from_rank_bits_five(rank_bits: i16) -> Rank {
+    // We don't want to return an Ace as the high card if it's part of a low straight
     if rank_bits == lookup_table::constants::STRAIGHTS[9] {
         return Rank::Five;
     }
     for i in INT_RANKS.rev() {
         if rank_bits & (1 << i) != 0 {
             return Rank::ALL_VARIANTS[i as usize];
+        }
+    }
+    unreachable!();
+}
+
+pub fn high_rank_from_rank_bits_three(rank_bits: i16) -> i16 {
+    if rank_bits == crate::evaluate::three_card::lookup_table::constants::STRAIGHTS[11] {
+        return 1 << 1
+    }
+    for i in INT_RANKS.rev() {
+        if rank_bits & (1 << i) != 0 {
+            return rank_bits & (1 << i)
         }
     }
     unreachable!();
