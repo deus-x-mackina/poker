@@ -3,7 +3,7 @@ use std::{env, fs::File, io::Write, path::PathBuf};
 
 #[cfg(feature = "static_lookup")]
 const URL: &str =
-    "https://raw.githubusercontent.com/deus-x-mackina/poker-lookup-table/main/codegen.txt";
+    "https://raw.githubusercontent.com/deus-x-mackina/poker-lookup-table/8e22032a6280eb790a13cc16b26efe4e16d1f43a/codegen.txt";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !cfg!(feature = "static_lookup") {
