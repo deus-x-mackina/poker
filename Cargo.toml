@@ -1,6 +1,6 @@
 [package]
 name = "poker"
-version = "0.6.4"
+version = "0.6.5"
 rust-version = "1.63.0"
 authors = ["Daniel Mack"]
 edition = "2021"
