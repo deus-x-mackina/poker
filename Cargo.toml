@@ -1,9 +1,9 @@
 [package]
 name = "poker"
-version = "0.6.5"
-rust-version = "1.63.0"
+version = "0.7.0"
+rust-version = "1.85.0"
 authors = ["Daniel Mack"]
-edition = "2021"
+edition = "2024"
 repository = "https://github.com/deus-x-mackina/poker"
 license = "MIT"
 documentation = "https://docs.rs/poker"
@@ -46,7 +46,7 @@ lazy_static = "1"
 doc-comment = "0.3"
 # Examples
 rustyline = "15"
-colored = "2"
+colored = "3"
 rustyline-derive = "0.11"
 # Benching
 criterion = { version = "0.5", features = ["html_reports"] }
