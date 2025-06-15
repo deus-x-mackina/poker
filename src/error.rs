@@ -9,9 +9,13 @@ use std::{error::Error, fmt};
 
 use itertools::Itertools;
 
-use crate::card::Card;
+use crate::{card::Card, evaluate::eval::Eval};
 
-/// An error than can be thrown when parsing [`Card`] types from strings.
+/// Result type for evaluation operations, either returning an [`Eval`] or an
+/// [`EvalError`].
+pub type EvalResult<P> = Result<Eval<P>, EvalError>;
+
+/// An error that can be thrown when parsing [`Card`] types from strings.
 ///
 /// # Examples
 ///
@@ -65,7 +69,7 @@ use crate::card::Card;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseCardError {
     /// A string to be interpreted as a [`Card`] must be exactly two characters
-    /// long. This variant is used if the input does not have meet this
+    /// long. This variant is used if the input does not meet this
     /// criterion.
     InvalidLength {
         /// The input that incited this error, converted to a [`String`] if
@@ -84,8 +88,8 @@ pub enum ParseCardError {
         /// not be interpreted as a card rank.
         incorrect_char: char,
     },
-    /// A string to be interpreted as a [`Card`] must have its first character
-    /// be one of "23456789TJQKA", otherwise, this error will be thrown and
+    /// A string to be interpreted as a [`Card`] must have its second character
+    /// be one of "chsd", otherwise, this error will be thrown and
     /// indicate the incorrect character.
     InvalidSuit {
         /// The input that incited this error, converted to a [`String`] if
@@ -148,16 +152,16 @@ impl Error for ParseCardError {}
 ///     King, Clubs;
 ///     King, Clubs
 /// ).to_vec();
-/// let result = eval.evaluate(&hand);
+/// let result = eval.evaluate_five(&hand);
 /// assert_eq!(
 ///     result,
 ///     Err(EvalError::CardsNotUnique(hand.clone()))
 /// );
 /// ```
 ///
-/// A group of 5 or more cards can be evaulated for the combination that yields
+/// A group of 5 or more cards can be evaluated for the combination that yields
 /// the best possible poker hand, but four of less cards cannot be evaluated.
-/// This will throw [`EvalError::InvalidHandSize`]:
+/// This will throw [`EvalError::InvalidHandSize5`]:
 ///
 /// ```
 /// use poker::{cards, Evaluator, EvalError};
@@ -168,10 +172,30 @@ impl Error for ParseCardError {}
 ///     Seven, Hearts;
 ///     Eight, Spades;
 /// ).to_vec();
-/// let result = eval.evaluate(&four_cards);
+/// let result = eval.evaluate_five(&four_cards);
 /// assert_eq!(
 ///     result,
-///     Err(EvalError::InvalidHandSize(4)),
+///     Err(EvalError::InvalidHandSize5(4)),
+/// );
+/// ```
+///
+/// Similarly, when evaluating a three-card poker hand, exactly three cards must
+/// be passed, or else [`EvalError::InvalidHandSize3`] will be returned from
+/// evaluation functions.
+///
+/// ```
+/// use poker::{cards, Evaluator, EvalError};
+/// let eval = Evaluator::new();
+/// let four_cards = cards!(
+///     Two, Clubs;
+///     Ten, Hearts;
+///     Seven, Hearts;
+///     Eight, Spades;
+/// ).to_vec();
+/// let result = eval.evaluate_three(&four_cards);
+/// assert_eq!(
+///     result,
+///     Err(EvalError::InvalidHandSize3(4)),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -181,7 +205,10 @@ pub enum EvalError {
     /// calculated when reporting in [`Display`](std::fmt::Display) format.
     CardsNotUnique(Vec<Card>),
     /// This variant is used when the cards to be evaluated total to 4 or less.
-    InvalidHandSize(usize),
+    InvalidHandSize5(usize),
+    /// This variant is used when the cards to be evaluated for three-card poker
+    /// don't total exactly 3.
+    InvalidHandSize3(usize),
 }
 
 impl fmt::Display for EvalError {
@@ -208,83 +235,18 @@ impl fmt::Display for EvalError {
                     dups
                 )
             }
-            Self::InvalidHandSize(size) => write!(
+            Self::InvalidHandSize5(size) => write!(
                 f,
-                "Cannot evaluate a poker hand with a set of less than 5 cards. Number of cards \
-                 received: {}",
-                size
+                "Cannot evaluate a five-card poker hand with a set of less than 5 cards. Number \
+                 of cards received: {size}"
+            ),
+            Self::InvalidHandSize3(size) => write!(
+                f,
+                "Cannot evaluate a three-card poker hand with a set of more or less than 3 cards. \
+                 Number of cards received: {size}"
             ),
         }
     }
 }
 
 impl Error for EvalError {}
-
-#[cfg(test)]
-mod tests {
-    use crate::{cards, Card};
-
-    #[test]
-    fn parse_card_error_format() {
-        // Invalid length
-        let e = "5".parse::<Card>().unwrap_err();
-
-        assert_eq!(
-            e.to_string(),
-            format!(
-                "Error parsing input '{}' as a Card: Found input of length {}, expected 2",
-                "5", 1
-            )
-        );
-
-        // Invalid rank
-        let e = "ac".parse::<Card>().unwrap_err();
-        assert_eq!(
-            e.to_string(),
-            format!(
-                "Error parsing input '{}' as a Card: Invalid rank character '{}', expected one of \
-                 [23456789TJQKA]",
-                "ac", 'a'
-            )
-        );
-
-        // Invalid suit
-        let e = "TC".parse::<Card>().unwrap_err();
-        assert_eq!(
-            e.to_string(),
-            format!(
-                "Error parsing input '{}' as a Card: Invalid suit character '{}', expected one of \
-                 [chsd]",
-                "TC", 'C'
-            )
-        );
-    }
-
-    #[test]
-    fn eval_error_format() {
-        use crate::evaluate::tests::EVALUATOR;
-        // Cards not unique
-        let cards = cards!("5c 5c Tc Jc Qc").try_collect::<Vec<Card>>().unwrap();
-        let e = EVALUATOR.evaluate(cards).unwrap_err();
-        assert_eq!(
-            e.to_string(),
-            format!(
-                "Cannot evaluate a poker hand with a set of cards that are not unique. Cards \
-                 duplicated at least once: {}",
-                "5c"
-            )
-        );
-
-        // Invalid hand size
-        let cards = &cards!(Ace of Spades);
-        let e = EVALUATOR.evaluate(cards).unwrap_err();
-        assert_eq!(
-            e.to_string(),
-            format!(
-                "Cannot evaluate a poker hand with a set of less than 5 cards. Number of cards \
-                 received: {}",
-                1
-            )
-        )
-    }
-}

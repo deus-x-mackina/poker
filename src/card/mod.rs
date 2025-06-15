@@ -159,8 +159,8 @@ impl Card {
         Ok(Self::new(rank, suit))
     }
 
-    /// Obtain this [`Card`]'s rank, which is one of clubs, hearts, diamonds, or
-    /// spades.
+    /// Obtain this [`Card`]'s rank, which is one of two, three, four, five,
+    /// six, seven, eight, nine, ten, jack, queen, king, or ace.
     ///
     /// # Example
     ///
@@ -175,8 +175,8 @@ impl Card {
         Rank::from_i32(rank_int)
     }
 
-    /// Obtain this [`Card`]'s suit, which is one of two, three, four, five,
-    /// six, seven, eight, nine, ten, jack, queen, king, or ace.
+    /// Obtain this [`Card`]'s suit, which is one of clubs, hearts, diamonds, or
+    /// spades.
     ///
     /// # Example
     ///
@@ -233,7 +233,7 @@ impl Card {
     }
 
     /// From an [`Iterator`] that yields strings, return a new [`Iterator`] that
-    /// yields `Result<Card, ParseCardError>`. The iterator adaoptor returned by
+    /// yields `Result<Card, ParseCardError>`. The iterator adaptor returned by
     /// this associated function has a special method [`try_collect`], which
     /// is a shortcut over using `collect::<Result<_, _>, _>()`. This was
     /// inspired by the [`itertools`] crate.
@@ -306,7 +306,7 @@ impl FromStr for Card {
 
 impl PartialOrd for Card {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.rank().partial_cmp(&other.rank())
+        Some(self.rank().cmp(&other.rank()))
     }
 }
 

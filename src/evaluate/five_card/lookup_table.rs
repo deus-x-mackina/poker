@@ -1,10 +1,13 @@
+use constants::*;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
-use self::constants::*;
 use crate::{
-    card::rank::Rank,
     constants::{INT_RANKS, PRIMES},
-    evaluate::{hand_rank::PokerHandRank, meta::Meta, utils},
+    evaluate::{
+        eval::Eval,
+        poker_type::FiveCard,
+        utils::{self, BitSequence},
+    },
 };
 
 /// Stores information about looking up poker hands.
@@ -20,8 +23,8 @@ use crate::{
 /// to `Meta::HighCard { hand_rank: HandRank(7462), high_rank: Rank::Seven }`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LookupTable {
-    pub flush_lookup: FxHashMap<i32, Meta>,
-    pub unsuited_lookup: FxHashMap<i32, Meta>,
+    pub flush_lookup: FxHashMap<i32, Eval<FiveCard>>,
+    pub unsuited_lookup: FxHashMap<i32, Eval<FiveCard>>,
 }
 
 impl LookupTable {
@@ -38,34 +41,9 @@ impl LookupTable {
     /// Calculate the metadata for flushes, straights, high cards, and straight
     /// flushes.
     fn flushes_straights_high_cards(&mut self) {
-        let mut not_straights = Vec::with_capacity(1277);
-        // `0b11111` represents a 2-3-4-5-6 hand (suit unknown).
-        // the bit sequence generator will help generate other permutations
-        // of integers where only five bits are turned on, thus allowing us to consider
-        // every hand combination of five ranks together where each rank is unique,
-        // i.e., there are no pairs, trips, quads, etc.
-        // We are going to add each combination that isn't a straight into the
-        // `not_straights` vector
-        let mut gen = utils::BitSequence::new(0b11111);
+        const NOT_STRAIGHTS: [i16; 1277] = constants::not_straights();
 
-        // info: We statically calculated all straights in the `STRAIGHTS` constant
-        for _ in 0..1286 {
-            let bits = gen.get_next();
-            let mut not_straight = true;
-            for straight in STRAIGHTS {
-                // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add
-                // it to our vector
-                if bits ^ straight == 0 {
-                    not_straight = false;
-                    break;
-                }
-            }
-            if not_straight {
-                not_straights.push(bits);
-            }
-        }
-
-        // Now we have `STRAIGHTS` (our constant) and `not_straights` (dynamically
+        // Now we have `STRAIGHTS` (our constant) and `not_straights` (const-
         // calculated). Using these, we can consider both sets as if the ranks
         // they encode are suited
         //   - `STRAIGHT` hands suited become straight flushes
@@ -86,8 +64,8 @@ impl LookupTable {
 
         // These are recycled and hold the rank of the highest card of the hand and the
         // prime product
-        let mut high_rank;
-        let mut prime_product;
+        let mut high_rank: i16;
+        let mut prime_product: i32;
 
         // Straight flushes and straights
         for straight in STRAIGHTS {
@@ -99,23 +77,13 @@ impl LookupTable {
 
             // Into the flush table we map the prime product to a straight flush
             // the has our current `rank_suited` value and the highest card's rank
-            self.flush_lookup.insert(
-                prime_product,
-                Meta::StraightFlush {
-                    hand_rank: PokerHandRank(rank_suited),
-                    high_rank,
-                },
-            );
+            self.flush_lookup
+                .insert(prime_product, Eval::new(rank_suited, high_rank));
 
             // Into the unsuited table, we map the same prime product to a straight
             // with our current `rank_unsuited` value and the highest card's rank
-            self.unsuited_lookup.insert(
-                prime_product,
-                Meta::Straight {
-                    hand_rank: PokerHandRank(rank_unsuited),
-                    high_rank,
-                },
-            );
+            self.unsuited_lookup
+                .insert(prime_product, Eval::new(rank_unsuited, high_rank));
 
             // We increment our values as in the next loop we consider the next-worse hand.
             rank_suited = rank_suited.wrapping_add(1);
@@ -134,7 +102,7 @@ impl LookupTable {
         // Flushes and high cards
         // We reverse `not_straights` before looping because we generated the worst
         // hands first, but we want to start mapping from the best hands
-        for bits in not_straights.into_iter().rev() {
+        for bits in NOT_STRAIGHTS.into_iter().rev() {
             // Get the prime product from the bits
             prime_product = utils::prime_product_from_rank_bits(bits);
 
@@ -142,22 +110,12 @@ impl LookupTable {
             high_rank = utils::high_rank_from_rank_bits_five(bits);
 
             // In the flush table, map the prime product to a flush
-            self.flush_lookup.insert(
-                prime_product,
-                Meta::Flush {
-                    hand_rank: PokerHandRank(rank_suited),
-                    high_rank,
-                },
-            );
+            self.flush_lookup
+                .insert(prime_product, Eval::new(rank_suited, high_rank));
 
             // In the unsuited table, map it to a high card hand
-            self.unsuited_lookup.insert(
-                prime_product,
-                Meta::HighCard {
-                    hand_rank: PokerHandRank(rank_unsuited),
-                    high_rank,
-                },
-            );
+            self.unsuited_lookup
+                .insert(prime_product, Eval::new(rank_unsuited, high_rank));
 
             // Increment our values to consider the next worst hand
             rank_suited = rank_suited.wrapping_add(1);
@@ -177,7 +135,7 @@ impl LookupTable {
         // extra card, the kicker, is left, which can be one of the other eleven
         // card ranks. We start our rank at just worse than the worst straight
         // flush
-        let mut rank = WORST_STRAIGHT_FLUSH.wrapping_add(1);
+        let mut rank = WORST_STRAIGHT_FLUSH + 1;
 
         // First, select our rank that there will be 4x
         for quad in INT_RANKS.rev() {
@@ -190,20 +148,15 @@ impl LookupTable {
                     .wrapping_mul(PRIMES[k as usize]); // 1x the kicker
 
                 // Map the product to the appropriate hand
-                self.unsuited_lookup.insert(
-                    product,
-                    Meta::FourOfAKind {
-                        hand_rank: PokerHandRank(rank),
-                        quads: Rank::ALL_VARIANTS[quad as usize],
-                    },
-                );
+                self.unsuited_lookup
+                    .insert(product, Eval::new(rank, 1i16.wrapping_shl(quad as u32)));
                 rank = rank.wrapping_add(1);
             }
         }
 
         // Full house
         // We have one three of a kind (trips) and one (pair)
-        rank = WORST_FOUR_OF_A_KIND.wrapping_add(1);
+        rank = WORST_FOUR_OF_A_KIND + 1;
         // We select our trips rank...
         for trips in INT_RANKS.rev() {
             // ...and select our pair rank
@@ -213,53 +166,42 @@ impl LookupTable {
                 // of 2 for the 2x rank
                 product = PRIMES[trips as usize].wrapping_pow(3) // 3x trips
                     .wrapping_mul(PRIMES[pr as usize].wrapping_pow(2)); // 2x pair
-                self.unsuited_lookup.insert(
-                    product,
-                    Meta::FullHouse {
-                        hand_rank: PokerHandRank(rank),
-                        pair: Rank::ALL_VARIANTS[pr as usize],
-                        trips: Rank::ALL_VARIANTS[trips as usize],
-                    },
-                );
+                let mut rank_flags = 1i16.wrapping_shl(trips as u32) | 1i16.wrapping_shl(pr as u32);
+                if pr > trips {
+                    rank_flags |= 0b1000_0000_0000_0000u16 as i16;
+                }
+                self.unsuited_lookup
+                    .insert(product, Eval::new(rank, rank_flags));
                 rank = rank.wrapping_add(1);
             }
         }
 
         // Three of a kind
         // One 3x rank and two unique kickers
-        rank = WORST_STRAIGHT.wrapping_add(1);
+        rank = WORST_STRAIGHT + 1;
         for trips in INT_RANKS.rev() {
             let kickers = INT_RANKS
                 .rev()
                 .filter(|&kicker| kicker != trips)
                 .collect::<Vec<_>>();
             // We want every combination of two kickers
-            let gen = utils::const_combos::<_, 2>(&kickers);
-            for k in gen {
-                // Pull our kickers from the generator
-                let c1 = k[0] as usize;
-                let c2 = k[1] as usize;
-
+            let generator = utils::const_combos::<_, 2>(&kickers);
+            for [c1, c2] in generator {
                 // Calculate our prime product with power of 3 for the trips and simply
                 // multiply in the two kickers' primes
                 product = PRIMES[trips as usize].wrapping_pow(3) // 3x trips
-                    .wrapping_mul(PRIMES[c1]) // 1x first kicker
-                    .wrapping_mul(PRIMES[c2]); // 1x second kicker
+                    .wrapping_mul(PRIMES[c1 as usize]) // 1x first kicker
+                    .wrapping_mul(PRIMES[c2 as usize]); // 1x second kicker
 
-                self.unsuited_lookup.insert(
-                    product,
-                    Meta::ThreeOfAKind {
-                        hand_rank: PokerHandRank(rank),
-                        trips: Rank::ALL_VARIANTS[trips as usize],
-                    },
-                );
+                self.unsuited_lookup
+                    .insert(product, Eval::new(rank, 1i16.wrapping_shl(trips as u32)));
                 rank = rank.wrapping_add(1);
             }
         }
 
         // Two pair
         // Two unique 2x cards and one unique kicker
-        rank = WORST_THREE_OF_A_KIND.wrapping_add(1);
+        rank = WORST_THREE_OF_A_KIND + 1;
 
         // We want want every combination of two card ranks together to consider as our
         // two pair ranks
@@ -278,11 +220,10 @@ impl LookupTable {
                     .wrapping_mul(PRIMES[kicker as usize]); // 1x kicker
                 self.unsuited_lookup.insert(
                     product,
-                    Meta::TwoPair {
-                        hand_rank: PokerHandRank(rank),
-                        high_pair: Rank::ALL_VARIANTS[pair1 as usize],
-                        low_pair: Rank::ALL_VARIANTS[pair2 as usize],
-                    },
+                    Eval::new(
+                        rank,
+                        1i16.wrapping_shl(pair1 as u32) | 1i16.wrapping_shl(pair2 as u32),
+                    ),
                 );
                 rank = rank.wrapping_add(1);
             }
@@ -290,7 +231,7 @@ impl LookupTable {
 
         // Pair
         // 1 pair rank and three unique kickers
-        rank = WORST_TWO_PAIR.wrapping_add(1);
+        rank = WORST_TWO_PAIR + 1;
         for pair_rank in INT_RANKS.rev() {
             let kickers = INT_RANKS
                 .rev()
@@ -313,10 +254,7 @@ impl LookupTable {
                     .wrapping_mul(PRIMES[k3]); // 1x third kicker
                 self.unsuited_lookup.insert(
                     product,
-                    Meta::Pair {
-                        hand_rank: PokerHandRank(rank),
-                        pair: Rank::ALL_VARIANTS[pair_rank as usize],
-                    },
+                    Eval::new(rank, 1i16.wrapping_shl(pair_rank as u32)),
                 );
                 rank = rank.wrapping_add(1);
             }
@@ -326,7 +264,12 @@ impl LookupTable {
     }
 }
 
+impl Default for LookupTable {
+    fn default() -> Self { Self::new() }
+}
+
 pub mod constants {
+    use super::*;
 
     // These are the worst hand ranks for each of the poker hands
 
@@ -353,30 +296,66 @@ pub mod constants {
         0b0_0000_0001_1111, // 31 => 23456
         0b1_0000_0000_1111, // 4111 => A2345
     ];
-}
 
-impl Default for LookupTable {
-    fn default() -> Self { Self::new() }
+    // Bit sequences that are not in the list above
+    pub const fn not_straights() -> [i16; 1277] {
+        let mut arr = [0; 1277];
+        let mut generator = BitSequence::new(0b11111);
+        let mut i = 0;
+        let mut cur = 0;
+        while i < 1286 {
+            let bits = generator.get_next();
+            let mut not_straight = true;
+            let mut j = 0;
+            while j < STRAIGHTS.len() {
+                let straight = STRAIGHTS[j];
+                // If the bits XOR a straight is 0, then it **is** a s traight, so we don't add
+                // it to our vector
+                if bits ^ straight == 0 {
+                    not_straight = false;
+                    break;
+                }
+                j += 1;
+            }
+            if not_straight {
+                arr[cur] = bits;
+                cur += 1;
+            }
+            i += 1;
+        }
+        arr
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[test]
-    fn check_metadata_ordering() {
+    fn five_card_table_contains_all_entries() {
+        let table = LookupTable::new();
+        let mut hand_ranks = HashSet::new();
+
         let LookupTable {
-            unsuited_lookup, ..
-        } = LookupTable::new();
-        for (_, metadata) in unsuited_lookup {
-            if let Meta::TwoPair {
-                high_pair,
-                low_pair,
-                ..
-            } = metadata
-            {
-                assert!(high_pair > low_pair);
-            }
-        }
+            flush_lookup,
+            unsuited_lookup,
+        } = table;
+
+        flush_lookup.values().for_each(|&eval| {
+            assert!(hand_ranks.insert(eval.hand_rank()));
+        });
+
+        unsuited_lookup.values().for_each(|&eval| {
+            assert!(hand_ranks.insert(eval.hand_rank()));
+        });
+
+        assert_eq!(hand_ranks.len(), WORST_HIGH_CARD as usize);
+
+        let mut v = hand_ranks.into_iter().collect::<Vec<_>>();
+        v.sort();
+        let w = (1..=WORST_HIGH_CARD).collect::<Vec<_>>();
+        assert_eq!(v, w);
     }
 }

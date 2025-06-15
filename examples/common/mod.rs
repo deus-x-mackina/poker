@@ -4,7 +4,7 @@ use std::borrow::Cow;
 
 use colored::Colorize;
 use rustyline::{
-    highlight::Highlighter, history::MemHistory, ColorMode, Config, Editor as RlEditor,
+    ColorMode, Config, Editor as RlEditor, highlight::Highlighter, history::MemHistory,
 };
 use rustyline_derive::{Completer, Helper, Hinter, Validator};
 

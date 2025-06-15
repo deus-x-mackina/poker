@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use colored::Colorize;
 use itertools::Itertools;
-use poker::{deck, Card, EvalClass, Evaluator, Rank};
+use poker::{Card, Eval, Evaluator, Rank, deck, evaluate::poker_type::FiveCard};
 use rand::prelude::*;
 
 #[macro_use]
@@ -27,7 +27,7 @@ fn main() {
     let mut rl = common::editor();
 
     // Game setup
-    let mut deck = deck::shuffled().to_vec();
+    let mut deck = deck::shuffled();
     let mut credits = STARTING_CREDITS;
     let mut hand = Vec::with_capacity(5);
 
@@ -41,7 +41,7 @@ fn main() {
 
         // Deal hand and print cards, along with helper numbers
         hand.extend(deck.drain(..5));
-        let first_eval = eval.evaluate(&hand).unwrap();
+        let first_eval = eval.evaluate_five(&hand).unwrap();
         clear_terminal!();
         println!(
             "{} {} {} {} {} ({})\n (1)    (2)    (3)    (4)    (5)",
@@ -60,14 +60,14 @@ fn main() {
         }
 
         // Print second hand
-        let second_eval = eval.evaluate(&hand).unwrap();
+        let second_eval = eval.evaluate_five(&hand).unwrap();
         println!(
             "{} {} {} {} {} ({})",
             &hand[0], &hand[1], &hand[2], &hand[3], &hand[4], second_eval
         );
 
         // Compare swapped hand to first hand
-        match (second_eval.class(), first_eval.class()) {
+        match (second_eval, first_eval) {
             (sec, fir) if sec > fir => {
                 println!("{}", "You got a better hand!".bright_green().bold())
             }
@@ -78,7 +78,7 @@ fn main() {
         }
 
         // Calculate winnings
-        let winnings = payout(wager, second_eval.class());
+        let winnings = payout(wager, second_eval);
         let winnings_string = {
             let s = format!("Winnings: {}", winnings);
             if winnings > 0 {
@@ -96,14 +96,14 @@ fn main() {
 
         // Cleanup
         println!();
-        deck.extend(hand.drain(..));
+        deck.append(&mut hand);
         deck.shuffle(&mut rng);
 
         // Loop back
     }
 }
 
-fn swap_cards(swaps: Vec<usize>, deck: &mut Vec<Card>, hand: &mut Vec<Card>, rng: &mut ThreadRng) {
+fn swap_cards(swaps: Vec<usize>, deck: &mut Vec<Card>, hand: &mut [Card], rng: &mut ThreadRng) {
     for &index in &swaps {
         deck.push(hand[index]);
     }
@@ -230,35 +230,32 @@ fn get_swaps(rl: &mut Editor) -> Option<Vec<usize>> {
     }
 }
 
-const fn payout(wager: usize, class: EvalClass) -> usize {
-    use EvalClass::*;
-    match class {
-        // I would use a `if pair >= Rank::Jack` guard here, but then the function wouldn't be
-        // `const`!
-        Pair { pair: Rank::Jack }
-        | Pair { pair: Rank::Queen }
-        | Pair { pair: Rank::King }
-        | Pair { pair: Rank::Ace } => wager,
+const fn payout(wager: usize, eval: Eval<FiveCard>) -> usize {
+    use Rank::*;
 
-        TwoPair { .. } => 2 * wager,
-        ThreeOfAKind { .. } => 3 * wager,
-        Straight { .. } => 4 * wager,
-        Flush { .. } => 6 * wager,
-        FullHouse { .. } => 9 * wager,
-        FourOfAKind { .. } => 25 * wager,
-
-        // Royal flush
-        StraightFlush {
-            high_rank: Rank::Ace,
-        } => {
-            if wager == MAX_WAGER {
-                4000
-            } else {
-                250 * wager
-            }
+    if let Some(Jack | Queen | King | Ace) = eval.pair() {
+        wager
+    } else if eval.is_two_pair() {
+        2 * wager
+    } else if eval.is_three_of_a_kind() {
+        3 * wager
+    } else if eval.is_straight() {
+        4 * wager
+    } else if eval.is_flush() {
+        6 * wager
+    } else if eval.is_full_house() {
+        9 * wager
+    } else if eval.is_four_of_a_kind() {
+        25 * wager
+    } else if eval.is_royal_flush() {
+        if wager == MAX_WAGER {
+            4000
+        } else {
+            250 * wager
         }
-        StraightFlush { .. } => 50 * wager,
-
-        _ => 0,
+    } else if eval.is_straight() {
+        50 * wager
+    } else {
+        0
     }
 }

@@ -7,7 +7,7 @@
 /// enum variant names for [`Rank`] and [`Suit`]
 ///
 /// ```
-/// use poker::{card, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, card};
 /// const ACE_OF_SPADES: Card = card!(Ace, Spades);
 /// assert_eq!(ACE_OF_SPADES, Card::new(Rank::Ace, Suit::Spades));
 /// ```
@@ -16,7 +16,7 @@
 /// readability.
 ///
 /// ```
-/// use poker::{card, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, card};
 /// const ACE_OF_SPADES: Card = card!(Ace of Spades);
 /// assert_eq!(ACE_OF_SPADES, Card::new(Rank::Ace, Suit::Spades));
 /// ```
@@ -27,7 +27,7 @@
 /// case-sensitive!
 ///
 /// ```
-/// use poker::{card, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, card};
 /// let ace_of_spades = card!("As").expect("couldn't parse card");
 /// assert_eq!(ace_of_spades, Card::new(Rank::Ace, Suit::Spades));
 /// ```
@@ -53,12 +53,12 @@ macro_rules! card {
 ///
 /// You can specify multiple cards by entering a comma-separated pair of
 /// capitalized rank and suit, and with each pair being separated by a
-/// semicolon. The reason for the zapitalized names is because the macro inlines
+/// semicolon. The reason for the capitalized names is because the macro inlines
 /// these as enum variants of [`Rank`] and [`Suit`]. This is `const`-friendly
 /// and results in an array type.
 ///
 /// ```
-/// use poker::{cards, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, cards};
 ///
 /// const KING_AND_QUEEN: [Card; 2] = cards!(
 ///     King, Hearts;
@@ -78,7 +78,7 @@ macro_rules! card {
 /// As in the previous example, this is `const`-friendly and returns an array.
 ///
 /// ```
-/// use poker::{cards, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, cards};
 ///
 /// const KING_AND_QUEEN: [Card; 2] = cards!(
 ///     King of Hearts,
@@ -100,7 +100,7 @@ macro_rules! card {
 /// internally, so you can use [`try_collect`] on the iterator.
 ///
 /// ```
-/// use poker::{cards, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, cards};
 ///
 /// // Collect into a `Vec<Card>` by using `collect::<Result<_, _>>()` on an iterator that
 /// // yields `Result` types.
@@ -122,7 +122,7 @@ macro_rules! card {
 /// yielding a `Result`. You can also call [`try_collect`] in this case.
 ///
 /// ```
-/// use poker::{cards, Card, Rank, Suit};
+/// use poker::{Card, Rank, Suit, cards};
 ///
 /// let king_and_queen: Vec<_> = cards!("Kh Qh").try_collect().expect("couldn't parse cards");
 ///

@@ -2,8 +2,7 @@
 use std::{env, fs::File, io::Write, path::PathBuf};
 
 #[cfg(feature = "static_lookup")]
-const URL: &str =
-    "https://raw.githubusercontent.com/deus-x-mackina/poker-lookup-table/main/codegen.txt";
+const URL: &str = "https://raw.githubusercontent.com/deus-x-mackina/poker-lookup-table/ab48033c149d524098c1f921f1ba9989fd4c2b03/codegen.txt";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !cfg!(feature = "static_lookup") {
@@ -20,10 +19,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let path = env::var("OUT_DIR").map(PathBuf::from)?.join("codegen.rs");
         let mut file = File::create(path)?;
         let bytes = match reqwest::blocking::get(URL) {
-            Err(_) => panic!(
-                "Unable to download static lookup tables with feature `static_lookup`. \
-                Ensure you are connected to the internet and the build script has permissions to access \
-                the internet."
+            Err(e) => panic!(
+                "Failed to download static lookup tables for `static_lookup` feature.\nError: \
+                 {}\nSolutions:\n- Ensure you have an active internet connection\n- Check if your \
+                 firewall/proxy allows access to GitHub\n- Try building without the \
+                 `static_lookup` feature: cargo build --no-default-features\n- If offline, \
+                 consider using the default runtime table generation instead",
+                e
             ),
             Ok(response) => response.bytes()?,
         };

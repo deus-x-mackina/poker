@@ -5,9 +5,10 @@
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 `poker` is a Rust crate for the speedy evaluation and comparison of poker hands.
-It it based on the [`treys`](https://github.com/ihendley/treys) Python package
-and the algorithms found within, with mild adaptations and some personal touches
-to try to make it as idiomatic as possible in Rust.
+It supports both 5-card and 3-card poker hand evaluation. The crate is based on the 
+[`treys`](https://github.com/ihendley/treys) Python package and the algorithms found 
+within, with mild adaptations and some personal touches to try to make it as 
+idiomatic as possible in Rust.
 
 ```rust
 use poker::{Evaluator, deck, Card};
@@ -19,14 +20,35 @@ fn main() {
     // Generate a shuffled deck
     let mut deck = deck::shuffled();
 
-    // Deal a hand
+    // Deal a 5-card hand
     let hand: Vec<Card> = deck.drain(..5).collect();
 
-    // Evaluate
-    let result = eval.evaluate(hand).expect("Couldn't evaluate hand!");
+    // Evaluate 5-card hand
+    let result = eval.evaluate_five(&hand).expect("Couldn't evaluate hand!");
 
     // Print the hand result
-    println!("{}", result);
+    println!("5-card hand: {}", result);
+
+    // Deal a 3-card hand
+    let three_card_hand: Vec<Card> = deck.drain(..3).collect();
+
+    // Evaluate 3-card hand
+    let three_result = eval.evaluate_three(&three_card_hand).expect("Couldn't evaluate hand!");
+
+    // Print the 3-card hand result
+    println!("3-card hand: {}", three_result);
+
+    let other_hand = deck.drain(..5);
+
+    let other_result = eval
+        .evaluate_five(&other_hand)
+        .expect("Couldn't evaluate hand!");
+
+    if result.is_better_than(other_result) {
+        println!("You win!");
+    } else {
+        println!("You lose...");
+    }
 }
 ```
 
@@ -36,32 +58,35 @@ Add poker to the `dependencies` in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-poker = "0.6"
+poker = "0.7"
 ```
 
 ## Features
 
-`poker` currently has two features. One depends on the [`rand`](https://crates.io/crates/rand)
-crate, in order to shuffle generated decks. This is enabled by default.
+`poker` supports both 5-card and 3-card poker hand evaluation with fast lookup tables.
 
-The second feature, which is **not** enabled by default is `static_lookup`.
-Enabling this feature opens up the `poker::evaluate::static_lookup` module,
-which contains the free `evaluate` function. It works similar to
-`Evaluator::evaluate`, but semantically it uses a static data structure that
-does not rely on heap allocations. Behind the scenes, the crate downloads data
-from [another repository](https://github.com/deus-x-mackina/poker-lookup-table)
-at build time and therefore won't have to construct this deterministic data at runtime.
+The crate currently has two features:
+
+1. **`rand`** (enabled by default): Depends on the [`rand`](https://crates.io/crates/rand)
+   crate for shuffling generated decks.
+
+2. **`static_lookup`** (not enabled by default): Opens up the `poker::evaluate::static_lookup` module,
+   which contains the free `evaluate` function. It works similar to
+   `Evaluator::evaluate`, but semantically it uses a static data structure that
+   does not rely on heap allocations. Behind the scenes, the crate downloads data
+   from [another repository](https://github.com/deus-x-mackina/poker-lookup-table)
+   at build time and therefore won't have to construct this deterministic data at runtime.
 
 ```toml
 [dependencies]
 # To use without `rand`, add `default-features = false`
-poker = { version = "0.6", features = ["static_lookup"] }
+poker = { version = "0.7", features = ["static_lookup"] }
 ```
 
 ## Examples
 
-`poker` includes two fun builtin examples: `poker-repl` and `jacks-or-better`.
-`poker-repl` is a `repl`-like environment when you can evaluate different poker
+`poker` includes two fun built-in examples: `poker-repl` and `jacks-or-better`.
+`poker-repl` is a `repl`-like environment where you can evaluate different poker
 hands. `jacks-or-better` is a terminal re-creation of the Jacks or Better video
 poker game. Rules for the game can be found
 [here](https://www.liveabout.com/jacks-or-better-video-poker-2727991), with the

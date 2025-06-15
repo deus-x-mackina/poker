@@ -1,10 +1,9 @@
 use std::array;
 
 use crate::{
-    card::{rank::Rank, Card},
-    constants::{INT_RANKS, PRIMES},
-    evaluate::lookup_table,
     Suit,
+    card::{Card, rank::Rank},
+    constants::{INT_RANKS, PRIMES},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -72,11 +71,11 @@ impl BitSequence {
         }
     }
 
-    pub fn get_next(&mut self) -> i16 {
+    pub const fn get_next(&mut self) -> i16 {
         self.t = self.bits | self.bits.wrapping_sub(1);
         self.next_bits = self.t.wrapping_add(1);
         self.next_bits |= ((!self.t & (!self.t).wrapping_neg()).wrapping_sub(1))
-            >> self.bits.trailing_zeros().wrapping_add(1);
+            .wrapping_shr(self.bits.trailing_zeros().wrapping_add(1));
         self.bits = self.next_bits;
         self.next_bits
     }
@@ -104,22 +103,22 @@ pub fn prime_product_from_rank_bits(rank_bits: i16) -> i32 {
 
 /// Calculate a hand's prime product if an entire `Card` representation is
 /// available.
-pub fn prime_product_from_hand(hand: [Card; 5]) -> i32 {
+pub fn prime_product_from_hand<const N: usize>(hand: [Card; N]) -> i32 {
     hand.into_iter()
         .map(|card| card.unique_integer() & 0xFF)
         .fold(1, |acc, x| acc.wrapping_mul(x))
 }
 
 /// Obtain the high card from a given set of rank bits bit-ORed together.
-pub fn high_rank_from_rank_bits_five(rank_bits: i16) -> Rank {
+pub fn high_rank_from_rank_bits_five(rank_bits: i16) -> i16 {
     // We don't want to return an Ace as the high card if it's part of a low
     // straight
-    if rank_bits == lookup_table::constants::STRAIGHTS[9] {
-        return Rank::Five;
+    if rank_bits == crate::evaluate::five_card::lookup_table::constants::STRAIGHTS[9] {
+        return 1 << 3;
     }
     for i in INT_RANKS.rev() {
         if rank_bits & (1 << i) != 0 {
-            return Rank::ALL_VARIANTS[i as usize];
+            return rank_bits & (1 << i);
         }
     }
     unreachable!();
@@ -214,12 +213,12 @@ mod tests {
 
     #[test]
     fn const_combos_works() {
-        let combos = Combinations::<'_, _, 2>::new(&vec!['c', 'a', 't']).collect::<Vec<_>>();
+        let combos = Combinations::<'_, _, 2>::new(&['c', 'a', 't']).collect::<Vec<_>>();
         dbg!(&combos);
         let expected_combos: [[char; 2]; 3] = [['c', 'a'], ['c', 't'], ['a', 't']];
         assert_eq!(combos.len(), expected_combos.len());
         for &combo in &expected_combos {
-            assert!(combos.contains(&combo.into()));
+            assert!(combos.contains(&combo));
         }
     }
 }

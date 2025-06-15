@@ -1,6 +1,6 @@
-use criterion::{criterion_group, criterion_main, Criterion};
+use criterion::{Criterion, criterion_group, criterion_main};
 use itertools::Itertools;
-use poker::{cards, deck, evaluate::static_lookup, Evaluator};
+use poker::{Evaluator, cards, deck, evaluate::static_lookup};
 
 fn bench_evaluator(c: &mut Criterion) {
     c.bench_function("Evaluator::new()", |b| b.iter(Evaluator::new));
@@ -14,13 +14,13 @@ fn bench_single_5card_hand_eval(c: &mut Criterion) {
 
     group.bench_function("dynamic", |b| {
         b.iter(|| {
-            let _ = eval.evaluate(&hand);
+            let _ = eval.evaluate_five(&hand);
         })
     });
 
     group.bench_function("static", |b| {
         b.iter(|| {
-            let _ = static_lookup::evaluate(&hand);
+            let _ = static_lookup::evaluate_five(&hand);
         })
     });
 
@@ -37,13 +37,13 @@ fn bench_single_7card_hand_eval(c: &mut Criterion) {
 
     group.bench_function("dynamic", |b| {
         b.iter(|| {
-            let _ = eval.evaluate(&hand);
+            let _ = eval.evaluate_five(&hand);
         })
     });
 
     group.bench_function("static", |b| {
         b.iter(|| {
-            let _ = static_lookup::evaluate(&hand);
+            let _ = static_lookup::evaluate_five(&hand);
         })
     });
 
@@ -54,14 +54,13 @@ fn bench_all_5card_eval(c: &mut Criterion) {
     let mut group = c.benchmark_group("all_5card_eval");
     group.sample_size(10);
     let eval = Evaluator::new();
-    let gen = deck::generate().combinations(5).collect::<Box<_>>();
+    let generator = deck::generate().combinations(5).collect::<Box<_>>();
 
     let routine = {
-        let eval = eval;
-        let gen = &gen;
+        let generator = &generator;
         move || {
-            for cards in gen.iter() {
-                let _ = eval.evaluate(cards);
+            for cards in generator.iter() {
+                let _ = eval.evaluate_five(cards);
             }
         }
     };
@@ -70,8 +69,57 @@ fn bench_all_5card_eval(c: &mut Criterion) {
 
     group.bench_function("static", |b| {
         b.iter(|| {
-            for cards in gen.iter() {
-                let _ = static_lookup::evaluate(cards);
+            for cards in generator.iter() {
+                let _ = static_lookup::evaluate_five(cards);
+            }
+        });
+    });
+
+    group.finish();
+}
+
+fn bench_single_3card_hand_eval(c: &mut Criterion) {
+    let mut group = c.benchmark_group("single_3card_hand_eval");
+
+    let eval = Evaluator::new();
+    let hand: Vec<_> = cards!("Ah", "Kh", "Qh").try_collect().unwrap();
+
+    group.bench_function("dynamic", |b| {
+        b.iter(|| {
+            let _ = eval.evaluate_three(&hand);
+        })
+    });
+
+    group.bench_function("static", |b| {
+        b.iter(|| {
+            let _ = static_lookup::evaluate_three(&hand);
+        })
+    });
+
+    group.finish();
+}
+
+fn bench_all_3card_eval(c: &mut Criterion) {
+    let mut group = c.benchmark_group("all_3card_eval");
+    group.sample_size(10);
+    let eval = Evaluator::new();
+    let generator = deck::generate().combinations(3).collect::<Box<_>>();
+
+    let routine = {
+        let generator = &generator;
+        move || {
+            for cards in generator.iter() {
+                let _ = eval.evaluate_three(cards);
+            }
+        }
+    };
+
+    group.bench_function("dynamic", |b| b.iter(&routine));
+
+    group.bench_function("static", |b| {
+        b.iter(|| {
+            for cards in generator.iter() {
+                let _ = static_lookup::evaluate_three(cards);
             }
         });
     });
@@ -85,6 +133,8 @@ criterion_group!(
     bench_single_5card_hand_eval,
     bench_single_7card_hand_eval,
     bench_all_5card_eval,
+    bench_single_3card_hand_eval,
+    bench_all_3card_eval,
 );
 
 criterion_main!(benches);
